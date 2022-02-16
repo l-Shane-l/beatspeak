@@ -1,4 +1,11 @@
-# BeatSpeak Naruto Release
+# Docs are out of date, I will update this later there is just a lot of code to change first the code isnt in a functioning state
+
+
+
+
+
+
+## BeatSpeak Naruto Release
 
 
 
