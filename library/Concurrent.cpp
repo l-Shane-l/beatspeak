@@ -100,8 +100,8 @@ void batchData(shared_ptr<Raw_Data_List> &rawData)
   {
     std::this_thread::sleep_for(std::chrono::seconds(5)); // spawns a process every 5 seconds
     condD.wait(lck);
-    std::thread run(processData, ref(rawData));
-    run.detach();
+    // std::thread run(processData, ref(rawData));
+    // run.detach();
   }
 }
 
