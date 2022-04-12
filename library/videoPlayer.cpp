@@ -18,20 +18,23 @@ int runVideo()
 
     Mat frame;
     // Capture frame-by-frame
+    cap >> frame;
 
     // If the frame is empty, break immediately
-    while (frame.empty())
-    {
-      cap >> frame;
-    }
+    if (frame.empty())
+      break;
 
     // Display the resulting frame
-    cout << "this far";
-    imshow("Frame", frame);
-    cout << "this far also";
-    char c = (char)waitKey(25);
-    if (c == 27)
-      break;
+    try
+    {
+      imshow("Frame", frame);
+      char c = (char)waitKey(25);
+      if (c == 27)
+        break;
+    }
+
+    catch (const std::exception &)
+    {}
 
     // Press  ESC on keyboard to exit
   }

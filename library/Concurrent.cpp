@@ -100,14 +100,14 @@ void batchData(shared_ptr<Raw_Data_List> &rawData)
   {
     std::this_thread::sleep_for(std::chrono::seconds(5)); // spawns a process every 5 seconds
     condD.wait(lck);
-    // std::thread run(processData, ref(rawData));
-    // run.detach();
+    std::thread run(processData, ref(rawData));
+    run.detach();
   }
 }
 
 void processData(shared_ptr<Raw_Data_List> &rawData)
 {
-  rawData->Modal_Dist_Filter();
+  // rawData->Modal_Dist_Filter();   // this causes a crash
   cout << "batched" << endl;
   // run raw_data_list functions here
   // add data is called from HeadTracker
