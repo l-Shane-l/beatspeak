@@ -80,12 +80,12 @@ void Raw_Data_List::Modal_Dist_Filter() // tested for time taken, fine up to 5 s
                 {
                         cout << k << endl;
 
-                        // need to iterate through both max_dist and also currentData and remove any array greater than the mode.
+                        // need to iterate through both max_dist and also inputData and remove any array greater than the mode.
                         if (max_dist[k] > mode) 
                         {
                                 int toDelete = k - deleted;
-                                currentData.erase(currentData.begin() + toDelete); // this is causing a crash
-                                cout <<"toDelete " << toDelete << " currentData " << currentData.size() << " maxDist " << max_dist.size() << endl;
+                                inputData.erase(inputData.begin() + toDelete); // this is causing a crash
+                                cout <<"toDelete " << toDelete << " inputData " << inputData.size() << " maxDist " << max_dist.size() << endl;
                                 deleted++;
 
                                 cout << " deleted " << endl;
@@ -99,19 +99,22 @@ void Raw_Data_List::Add_Spline()
 {
 
         tk::spline spl;
-        for (int i = 0; i < currentData.size(); i++)
+        for (int i = 0; i < inputData.size(); i++)
         {
-                vector<double> v(currentData[i].size());
+                vector<double> v(inputData[i].size());
                 iota(begin(v), end(v), 1);
-                spl.set_points(v, currentData[i]);
-                double denom = 1250 / (currentData[i].size());
+                spl.set_points(v, inputData[i]);
+                double denom = 1250 / (inputData[i].size());
                 vector<double> tmpVec;
                 for (int j = 0; j < 1250; j++)
                 {
                         double val = j / denom;
                         double val2 = spl(val);
                         tmpVec.push_back(val2);
+                        post_spline << val2 << ", ";
                 }
+                post_spline << endl;
                 postSpline.push_back(tmpVec);
+                
         }
 }

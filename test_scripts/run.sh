@@ -3,7 +3,7 @@ set -e
 echo "building"
 pwd
 cd ../build
-make
+ninja
 echo "removing previous runs data"
 pwd
 rm ../test_data/*
