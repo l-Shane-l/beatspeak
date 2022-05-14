@@ -18,7 +18,7 @@ struct Raw_Data_List
         double modal_dist;
         vector<int> max_dist;
         vector<vector<double>> currentData;
-        list<vector<double>> inputData;
+        vector<vector<double>> inputData;
         vector<vector<double>> postSpline;
         vector<int> modalTracker;
         vector<vector<double>> postButterworth;

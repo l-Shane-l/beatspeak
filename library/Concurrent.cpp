@@ -107,7 +107,9 @@ void batchData(shared_ptr<Raw_Data_List> &rawData)
 
 void processData(shared_ptr<Raw_Data_List> &rawData)
 {
-  // rawData->Modal_Dist_Filter();   // this causes a crash
+  rawData->currentData = rawData->inputData;
+  rawData->Modal_Dist_Filter(); // this causes a crash
+  //rawData->Add_Spline();
   cout << "batched" << endl;
   // run raw_data_list functions here
   // add data is called from HeadTracker
