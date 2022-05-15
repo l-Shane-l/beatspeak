@@ -1,5 +1,4 @@
 build/*
-.vscode
-python-dev-server/venv/*
+venv/
 source/*
 *.dat
