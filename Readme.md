@@ -1,27 +1,23 @@
-# Docs are out of date, I will update this later there is just a lot of code to change first the code isnt in a functioning state
+# In Development
 
+## TODO
 
+1. Implement butterworth filter
 
+2. build haskell test/dev server to graph data; this will be needed to debug the data progression from batch to pre PCA
 
+3. refactor code simplify and apply a more functional approach, leaning on pure fucntions
 
+4. Implement PCA
 
-## BeatSpeak Naruto Release
+5. Implement Signal selection
 
+6. Generate heartrate. 
 
+7. TBD
 
-### open terminal run mkdir build, cd build
+8. Implemnet Haskell server with api
 
-###  cmake -G Ninja -DBUILD_SHARED_LIBS=OFF ..
+9. build frontend in Flutter
 
-### ninja
-
-### ./source/opcv
-
-### press Esc to end the stream
-
-### ctrl-c to exit process
-
-
-## Generate Documentation
-
-### ninja doxygen
+10. release version 1.0
