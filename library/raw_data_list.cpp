@@ -42,7 +42,7 @@ void Raw_Data_List::Add_Data(vector<double> newData)
                 pre_spline << endl;
         }
 }
-// https://github.com/nxsEdson/Butterworth-Filter/blob/master/butterworth.cpp
+
 void Raw_Data_List::Butterworth_Filter(){}
 
 // void Raw_Data_List::PCA(){}
