@@ -2,7 +2,7 @@
 #define raw_data_list_hpp
 
 #include <list>
-#include "spline.h"
+#include "Spline.h"
 #include <cstdio>
 #include <cstdlib>
 #include <cmath>

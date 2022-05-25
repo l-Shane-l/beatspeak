@@ -1,4 +1,4 @@
-#include "../include/FacialRecogniser.hpp"
+#include "FacialRecogniser.hpp"
 
 
 void FacialRecogniser::detectAndDraw()

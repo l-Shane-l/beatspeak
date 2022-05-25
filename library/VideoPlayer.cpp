@@ -1,4 +1,4 @@
-#include "videoPlayer.h"
+#include "VideoPlayer.h"
 
 int runVideo()
 {

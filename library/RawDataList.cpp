@@ -1,4 +1,4 @@
-#include "raw_data_list.hpp"
+#include "RawDataList.hpp"
 #include <chrono>
 #include <thread>
 
@@ -14,7 +14,6 @@ void Raw_Data_List::Add_Data(vector<double> newData)
                 cout << inputData.size() << newData.size() << " sizes " << endl;
                 for (int i = 0; i < newData.size(); i++)
                 {
-
                         tmp.push_back({newData[i]});
                         modalTmp.push_back(0);
                 }
@@ -79,7 +78,6 @@ void Raw_Data_List::Modal_Dist_Filter() // tested for time taken, fine up to 5 s
                 for (int k = 0; k < max_dist.size(); k++)
                 {
                         cout << k << endl;
-
                         // need to iterate through both max_dist and also inputData and remove any array greater than the mode.
                         if (max_dist[k] > mode) 
                         {
@@ -87,7 +85,6 @@ void Raw_Data_List::Modal_Dist_Filter() // tested for time taken, fine up to 5 s
                                 inputData.erase(inputData.begin() + toDelete); // this is causing a crash
                                 cout <<"toDelete " << toDelete << " inputData " << inputData.size() << " maxDist " << max_dist.size() << endl;
                                 deleted++;
-
                                 cout << " deleted " << endl;
                         }
                 }
@@ -115,6 +112,5 @@ void Raw_Data_List::Add_Spline()
                 }
                 post_spline << endl;
                 postSpline.push_back(tmpVec);
-                
         }
 }

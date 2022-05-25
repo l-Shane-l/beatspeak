@@ -6,7 +6,7 @@
 #include "FacialRecogniser.hpp"
 #include "FacialPointsGenerator.hpp"
 #include "TrackerData.hpp"
-#include "raw_data_list.hpp"
+#include "RawDataList.hpp"
 
 using namespace std;
 
