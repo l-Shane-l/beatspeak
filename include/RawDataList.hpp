@@ -28,12 +28,16 @@ struct Raw_Data_List
         {
                 pre_spline.open("../test_data/pre_spline.dat");
                 post_spline.open("../test_data/post_spline.dat");
+                post_butterworth.open("../test_data/post_butterworth.dat");
+                post_modal_dist.open("../test_data/post_modal_dist");
         }
 
         ~Raw_Data_List()
         {
                 pre_spline.close();
                 post_spline.close();
+                post_butterworth.close();
+                post_modal_dist.close();
         }
         void Add_Data(vector<double> newData);
         void Modal_Dist_Filter();
@@ -42,7 +46,7 @@ struct Raw_Data_List
         void PCA();
 
 private:
-        ofstream pre_spline, post_spline;
+        ofstream pre_spline, post_spline, post_butterworth, post_modal_dist;
 };
 
 #endif
