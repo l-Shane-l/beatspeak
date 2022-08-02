@@ -44,6 +44,7 @@ struct Raw_Data_List
         void Butterworth_Filter();
         void Add_Spline();
         void PCA();
+        void Rotate_Vector_Right(vector<vector<double>> &matrix);
 
 private:
         ofstream pre_spline, post_spline, post_butterworth, post_modal_dist;

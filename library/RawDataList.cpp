@@ -38,7 +38,7 @@ void Raw_Data_List::Add_Data(vector<double> newData)
                 //        cout << elm << " ";
                 // }
                 // cout << endl;
-                pre_spline << endl;
+                pre_spline << endl;  // first
         }
 }
 
@@ -111,6 +111,29 @@ void Raw_Data_List::Add_Spline()
                         post_spline << val2 << ", ";
                 }
                 post_spline << endl;
-                postSpline.push_back(tmpVec);
+                postSpline.push_back(tmpVec); // second
+                // Rotate_Vector_Right(postSpline);
+                // for (int i = 0; i < postSpline.size(); i++){
+                //         for (int j = 0; j < postSpline[i].size(); j++){
+                //                 post_spline << postSpline[i][j] << ", ";
+                //         }
+                //         post_spline << endl;
+                // }
         }
+}
+
+
+
+void Rotate_Vector_Right(vector<vector<double>> &matrix){
+        vector<vector<double>> new_matrix;
+        cout << "before flip" << matrix.size();
+        for (int i = 0; i < matrix.size(); i++)
+        {
+                vector<double> tmp_vec = matrix[i];
+                for (int j = 0; j < tmp_vec.size(); j++){
+                        new_matrix[j].push_back(tmp_vec[j]);
+                }
+        }
+        matrix = new_matrix;
+        cout << "after flip" << matrix.size();
 }
