@@ -1,11 +1,11 @@
 #include "FacialPointsGenerator.hpp"
 
-void FacialPointsGenerator::trackPoints(vector<Point2f>& newPoints, shared_ptr<Raw_Data_List> &rawdata, bool update){
+void FacialPointsGenerator::trackPoints(vector<Point2f>& newPoints, bool update){
     if(update){
         generateMask();
         generateTrackingPoints();
     }
-    updateTrackedPoints(rawdata);
+   
     newPoints = currentPoints;
 }
 
@@ -24,7 +24,7 @@ void FacialPointsGenerator::generateTrackingPoints(){
     prevPoints = generatedPoints;
 }
 
-void FacialPointsGenerator::updateTrackedPoints(shared_ptr<Raw_Data_List> &rawdata){
+void FacialPointsGenerator::updateTrackedPoints(){
    if(Data->frameGray.rows == Data->oldFrame.rows && Data->frameGray.cols == Data->oldFrame.cols){
     TermCriteria criteria = TermCriteria((TermCriteria::COUNT) + (TermCriteria::EPS), 10, 0.03);
     try {
@@ -41,7 +41,7 @@ void FacialPointsGenerator::updateTrackedPoints(shared_ptr<Raw_Data_List> &rawda
             tmpY.push_back(currentPoints[i].y);
         }
     }
-    rawdata->Add_Data(tmpY);
+  
     prevPoints = tmp;
     Data->oldFrame = Data->frameGray.clone();
     drawPoints();

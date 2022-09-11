@@ -25,16 +25,15 @@ int run(int argc, char *argv[])
   shared_ptr<WebCam> camOutputRef = camInputRef;
   shared_ptr<WebCam> camTrackRef = camInputRef;
   unique_ptr<HeadTracker> tracker(new HeadTracker());
-  shared_ptr<Raw_Data_List> rawData(new Raw_Data_List());
 
   std::thread t1(getInput, ref(camInputRef));
-  std::thread t2(trackHead, ref(camInputRef), ref(tracker), ref(rawData));
+  std::thread t2(trackHead, ref(camInputRef), ref(tracker));
   std::thread t3(sendOutput, ref(camInputRef));
-  std::thread t4(batchData, ref(rawData));
+
   t1.join();
   t2.join();
   t3.join();
-  t4.join();
+
   cout << "End" << std::endl;
   return 0;
 }
@@ -52,7 +51,7 @@ void getInput(shared_ptr<WebCam> &cam)
   }
 }
 
-void trackHead(shared_ptr<WebCam> &cam, unique_ptr<HeadTracker> &tracker, shared_ptr<Raw_Data_List> &rawData)
+void trackHead(shared_ptr<WebCam> &cam, unique_ptr<HeadTracker> &tracker)
 {
   bool run = cam->running;
   std::unique_lock<std::mutex> lck(mutexB);
@@ -62,8 +61,8 @@ void trackHead(shared_ptr<WebCam> &cam, unique_ptr<HeadTracker> &tracker, shared
     condD.notify_one();
     condB.wait(lck);
     run = cam->running;
-    tracker->trackHeadInFrame(cam->getframeRGB(), cam->getframeGray(), rawData);
-    string hr = "HeartRate 72";
+    tracker->trackHeadInFrame(cam->getframeRGB(), cam->getframeGray());
+    string hr = "HeartRate Unknown";
     putText(cam->getframeRGB(), hr, Point(30, 30), FONT_HERSHEY_COMPLEX, 0.8, Scalar(0, 0, 255), 1);
   }
 }
@@ -93,24 +92,6 @@ void sendOutput(shared_ptr<WebCam> &cam)
   }
 }
 
-void batchData(shared_ptr<Raw_Data_List> &rawData)
-{
-  std::unique_lock<std::mutex> lck(mutexD);
-  while (true)
-  {
-    std::this_thread::sleep_for(std::chrono::seconds(5)); // spawns a process every 5 seconds
-    condD.wait(lck);
-    std::thread run(processData, ref(rawData));
-    run.detach();
-  }
-}
 
-void processData(shared_ptr<Raw_Data_List> &rawData)
-{
- 
-  rawData->Modal_Dist_Filter(); // this causes a crash
-  rawData->Add_Spline();
-  cout << "batched" << endl;
-  // run raw_data_list functions here
-  // add data is called from HeadTracker
-}
+
+

@@ -6,7 +6,7 @@
 #include "FacialRecogniser.hpp"
 #include "FacialPointsGenerator.hpp"
 #include "TrackerData.hpp"
-#include "RawDataList.hpp"
+
 
 using namespace std;
 
@@ -25,7 +25,7 @@ public:
         // shared_ptr<HeadMovementData> headPos(new HeadMovementData());
     }
 
-        void trackHeadInFrame(Mat& img, Mat& gray, shared_ptr<Raw_Data_List> &rawdata );
+        void trackHeadInFrame(Mat& img, Mat& gray );
     void test(){
         cout << "Tracker test" << endl;
     }

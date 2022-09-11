@@ -7,7 +7,6 @@
 #include "opencv2/video/tracking.hpp"
 #include "TrackerData.hpp"
 #include <iostream>
-#include "RawDataList.hpp"
 #include <memory>
 
 using namespace std;
@@ -21,7 +20,7 @@ struct FacialPointsGenerator
     }
 
 public:
-    void trackPoints(vector<Point2f> &newPoints, shared_ptr<Raw_Data_List> &rawdata, bool update);
+    void trackPoints(vector<Point2f> &newPoints, bool update);
     void setNumberOfPoints(int num)
     {
         numOfPoints = num;
@@ -30,7 +29,7 @@ public:
 private:
     void generateMask();
     void generateTrackingPoints();
-    void updateTrackedPoints(shared_ptr<Raw_Data_List> &rawdata);
+    void updateTrackedPoints();
     void drawPoints();
     Mat maskedFrame, errors;
     vector<Point2f> prevPoints, currentPoints, generatedPoints;

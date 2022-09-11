@@ -1,17 +1,17 @@
 #include "HeadTracker.hpp"
 
-void HeadTracker::trackHeadInFrame(Mat& FrameRGB, Mat& FrameGray, shared_ptr<Raw_Data_List> &rawdata){
+void HeadTracker::trackHeadInFrame(Mat& FrameRGB, Mat& FrameGray){
 
     trackerData->frameGray = FrameGray;
     trackerData->frameRGB = FrameRGB;
     if(points.size() < numOfPoints){
         faceReq->detectAndDraw();
         if(trackerData->faces.size() > 0){
-                pointsGen->trackPoints(points, rawdata, true);
+                pointsGen->trackPoints(points,  true);
         }
     }
     if(points.size() == numOfPoints){
-            pointsGen->trackPoints(points, rawdata, false);
+            pointsGen->trackPoints(points, false);
     }
 
 }
