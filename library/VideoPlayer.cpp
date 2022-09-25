@@ -1,20 +1,19 @@
-#include "VideoPlayer.h"
+#include "../include/VideoPlayer.h"
 
-int runVideo()
-{
+int runVideo() {
   VideoCapture cap("../../video/chaplin.mp4");
 
   // Check if camera opened successfully
-  if (!cap.isOpened())
-  {
+  if (!cap.isOpened()) {
     cout << "Error opening video stream or file" << endl;
     return -1;
   }
   int frame_width = cap.get(CAP_PROP_FRAME_WIDTH);
   int frame_height = cap.get(CAP_PROP_FRAME_HEIGHT);
-  VideoWriter video("beatspeakTest.avi", VideoWriter::fourcc('M', 'J', 'P', 'G'), 10, Size(frame_width, frame_height));
-  while (1)
-  {
+  VideoWriter video("beatspeakTest.avi",
+                    VideoWriter::fourcc('M', 'J', 'P', 'G'), 10,
+                    Size(frame_width, frame_height));
+  while (1) {
 
     Mat frame;
     // Capture frame-by-frame
@@ -25,16 +24,15 @@ int runVideo()
       break;
 
     // Display the resulting frame
-    try
-    {
+    try {
       imshow("Frame", frame);
       char c = (char)waitKey(25);
       if (c == 27)
         break;
     }
 
-    catch (const std::exception &)
-    {}
+    catch (const std::exception &) {
+    }
 
     // Press  ESC on keyboard to exit
   }
