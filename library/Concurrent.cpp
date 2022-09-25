@@ -18,7 +18,6 @@ int run(int argc, char *argv[]) {
 
   shared_ptr<WebCam> camInputRef(new WebCam(argv[1]));
   shared_ptr<WebCam> camOutputRef = camInputRef;
-  shared_ptr<WebCam> camTrackRef = camInputRef;
   unique_ptr<HeadTracker> tracker(new HeadTracker());
 
   std::thread t1(getInput, ref(camInputRef));

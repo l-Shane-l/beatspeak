@@ -1,7 +1,7 @@
 // g++ main.cpp -o app
 //  https://medium.com/analytics-vidhya/understanding-principle-component-analysis-pca-step-by-step-e7a4bb4031d9
-#include "../Eigen/Dense"
-#include "../Eigen/Eigenvalues"
+// #include "Eigen/Dense"
+// #include "Eigen/Eigenvalues"
 #include <iostream>
 #include <math.h>
 #include <vector>
@@ -81,36 +81,37 @@ int pca() {
   Standardization(features);
   std::vector<std::vector<double>> covMat = Covarience(features);
 
-  Eigen::MatrixXd m(covMat[0].size(),
-                    covMat.size()); // the nexted element ref is redundant
-                                    // because this should always be semetrical
-  for (int i = 0; i < covMat.size(); i++) {
-    Eigen::Vector4d v(covMat[i].data());
-    m.col(i) << v;
-  }
+  //   Eigen::MatrixXd m(covMat[0].size(),
+  //                     covMat.size()); // the nexted element ref is redundant
+  //                                     // because this should always be
+  //                                     semetrical
+  //   for (int i = 0; i < covMat.size(); i++) {
+  //     Eigen::Vector4d v(covMat[i].data());
+  //     m.col(i) << v;
+  //   }
 
-  Eigen::EigenSolver<Eigen::MatrixXd> eigensolver;
-  eigensolver.compute(m);
-  Eigen::VectorXd eigen_values = eigensolver.eigenvalues().real();
-  Eigen::MatrixXd eigen_vectors = eigensolver.eigenvectors().real();
+  //   Eigen::EigenSolver<Eigen::MatrixXd> eigensolver;
+  //   eigensolver.compute(m);
+  //   Eigen::VectorXd eigen_values = eigensolver.eigenvalues().real();
+  //   Eigen::MatrixXd eigen_vectors = eigensolver.eigenvectors().real();
 
-  Eigen::MatrixXd toChange(features[0].size(), features.size());
-  for (int i = 0; i < features.size(); i++) {
-    Eigen::VectorXd o1(features[i].size());
-    for (int j = 0; j < features[i].size(); j++) {
-      o1[j] = features[i][j];
-      toChange.col(i) << o1;
-    }
-  }
-  ///////////////to change
-  Eigen::MatrixXd trans(features.size(), EigenVectorsToUse);
-  for (int i = 0; i < EigenVectorsToUse; i++) {
-    trans.col(i) << eigen_vectors.col(i);
-  }
-  ////////////////////
-  cout << "start" << endl << trans << endl << "end" << endl;
+  //   Eigen::MatrixXd toChange(features[0].size(), features.size());
+  //   for (int i = 0; i < features.size(); i++) {
+  //     Eigen::VectorXd o1(features[i].size());
+  //     for (int j = 0; j < features[i].size(); j++) {
+  //       o1[j] = features[i][j];
+  //       toChange.col(i) << o1;
+  //     }
+  //   }
+  //   ///////////////to change
+  //   Eigen::MatrixXd trans(features.size(), EigenVectorsToUse);
+  //   for (int i = 0; i < EigenVectorsToUse; i++) {
+  //     trans.col(i) << eigen_vectors.col(i);
+  //   }
+  //   ////////////////////
+  //   cout << "start" << endl << trans << endl << "end" << endl;
 
-  cout << "Final" << endl << toChange * trans << endl << "Result" << endl;
+  //   cout << "Final" << endl << toChange * trans << endl << "Result" << endl;
 
-  return 0;
+  //   return 0;
 }

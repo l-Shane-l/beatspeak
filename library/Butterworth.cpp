@@ -5,7 +5,6 @@ int butterworth() {
   ifile.open("E:\\HRdataset\\butterworth\\input.txt");
   vector<double> input, output;
   double fps = 20;
-
   const int N = 100;
   //
   // for (int i = 0; i < 1000; i++)
