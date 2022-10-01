@@ -1,4 +1,4 @@
-#include "../include/Concurrent.hpp"
+#include "../../include/Concurrent.hpp"
 
 int WebCam::getWidth() { return cap.get(cv::CAP_PROP_FRAME_WIDTH); };
 int WebCam::getHeigth() { return cap.get(cv::CAP_PROP_FRAME_HEIGHT); };

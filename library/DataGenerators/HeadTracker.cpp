@@ -1,4 +1,4 @@
-#include "../include/HeadTracker.hpp"
+#include "../../include/DataGenerators/HeadTracker.hpp"
 
 void HeadTracker::trackHeadInFrame(Mat &FrameRGB, Mat &FrameGray) {
 

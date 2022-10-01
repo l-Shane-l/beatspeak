@@ -8,7 +8,7 @@ find_package (Threads)
 
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
-file(GLOB SRC  "*.cpp")
+file(GLOB_RECURSE SRC  "*.cpp")
 add_library (videoPlayer ${SRC})
 
 if( OpenCV_FOUND )

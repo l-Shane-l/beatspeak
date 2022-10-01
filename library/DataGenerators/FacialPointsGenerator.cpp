@@ -1,4 +1,4 @@
-#include "../include/FacialPointsGenerator.hpp"
+#include "../../include/DataGenerators/FacialPointsGenerator.hpp"
 
 void FacialPointsGenerator::trackPoints(vector<Point2f> &newPoints,
                                         bool update) {

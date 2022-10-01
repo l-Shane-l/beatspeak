@@ -1,5 +1,13 @@
 # In Development
 
+## Setup
+
+conan install .. -pr=beatspeak
+
+cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_TOOLCHAIN_PREFIX=llvm -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ..
+
+make
+
 ## TODO
 
 1. Implement butterworth filter

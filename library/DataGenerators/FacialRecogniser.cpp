@@ -1,4 +1,4 @@
-#include "../include/FacialRecogniser.hpp"
+#include "../../include/DataGenerators/FacialRecogniser.hpp"
 
 void FacialRecogniser::detectAndDraw() {
   face.detectMultiScale(Data->frameGray, Data->faces, 1.1, 8,

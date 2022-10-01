@@ -1,7 +1,7 @@
-#include "../include/VideoPlayer.h"
+#include "../../include/IO/VideoPlayer.h"
 
 int runVideo() {
-  VideoCapture cap("../../video/chaplin.mp4");
+  VideoCapture cap("../../../video/chaplin.mp4");
 
   // Check if camera opened successfully
   if (!cap.isOpened()) {
