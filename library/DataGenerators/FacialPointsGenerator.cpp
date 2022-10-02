@@ -1,15 +1,6 @@
 #include "../../include/DataGenerators/FacialPointsGenerator.hpp"
 
-void FacialPointsGenerator::trackPoints(vector<Point2f> &newPoints,
-                                        bool update) {
-  if (update) {
-    generateMask();
-    generateTrackingPoints();
-  }
-
-  newPoints = currentPoints;
-}
-
+// logic to setup tracking
 void FacialPointsGenerator::generateMask() {
   maskedFrame = Mat::zeros(Data->frameGray.rows, Data->frameGray.cols, CV_8UC1);
   ellipse2Poly(Data->faceCenter, (Data->radius) / 2, 0, 0, 360, 10, faceRegion);
@@ -26,6 +17,16 @@ void FacialPointsGenerator::generateTrackingPoints() {
   goodFeaturesToTrack(Data->frameGray, generatedPoints, numOfPoints, 0.001, 10,
                       maskedFrame, 3, false, 0.04);
   prevPoints = generatedPoints;
+}
+
+void FacialPointsGenerator::trackPoints(vector<Point2f> &newPoints,
+                                        bool update) {
+  if (update) {
+    generateMask();
+    generateTrackingPoints();
+  }
+  updateTrackedPoints();
+  newPoints = currentPoints;
 }
 
 void FacialPointsGenerator::updateTrackedPoints() {

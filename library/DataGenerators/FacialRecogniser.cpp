@@ -10,9 +10,7 @@ void FacialRecogniser::detectAndDraw() {
     Data->radius = Size(Data->face.width * 0.7, Data->face.height);
     // ellipse( Data->frameRGB, Data->faceCenter,Data->radius,0, 0, 360,
     // Data->trackerColor, 3, 8, 0 );
-
     faceArea = Data->frameGray(Data->face);
-
     eyes.detectMultiScale(faceArea, Data->eyes, 1.1, 3, 0 | CASCADE_SCALE_IMAGE,
                           Size(3, 3));
 

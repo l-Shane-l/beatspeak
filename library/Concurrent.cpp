@@ -2,8 +2,8 @@
 using namespace cv;
 promise<bool> prms;
 future<bool> ftr = prms.get_future();
-std::mutex mutexA, mutexB, mutexC, mutexD;
-std::condition_variable condA, condB, condC, condD;
+std::mutex mutexA, mutexB, mutexC;
+std::condition_variable condA, condB, condC;
 
 int run(int argc, char *argv[]) {
 
@@ -48,7 +48,6 @@ void trackHead(shared_ptr<WebCam> &cam, unique_ptr<HeadTracker> &tracker) {
   std::unique_lock<std::mutex> lck(mutexB);
   while (run) {
     condC.notify_one();
-    condD.notify_one();
     condB.wait(lck);
     run = cam->running;
     tracker->trackHeadInFrame(cam->getframeRGB(), cam->getframeGray());
@@ -72,8 +71,6 @@ void sendOutput(shared_ptr<WebCam> &cam) {
         cam->toggleRunning();
         condA.notify_one();
         condB.notify_one();
-        run = cam->running;
-        cout << run << endl;
         break;
       };
     }
