@@ -1,4 +1,6 @@
 #include "../include/Concurrent.hpp"
+#include "spdlog/spdlog.h"
+
 using namespace cv;
 promise<bool> prms;
 future<bool> ftr = prms.get_future();
@@ -8,6 +10,7 @@ std::condition_variable condA, condB, condC;
 int run(int argc, char *argv[]) {
 
   if (argc < 2) {
+    spdlog::info("Welcome to Beatspeak!");
     std::cerr << "enter the command like " << endl
               << argv[0] << " cam" << std::endl
               << "for webcam or " << std::endl
@@ -33,6 +36,7 @@ int run(int argc, char *argv[]) {
 }
 
 void getInput(shared_ptr<WebCam> &cam) {
+  spdlog::info("Get Info");
   bool run = cam->running;
   std::unique_lock<std::mutex> lck(mutexA);
   while (run) {
@@ -44,6 +48,7 @@ void getInput(shared_ptr<WebCam> &cam) {
 }
 
 void trackHead(shared_ptr<WebCam> &cam, unique_ptr<HeadTracker> &tracker) {
+  spdlog::info("Track Head");
   bool run = cam->running;
   std::unique_lock<std::mutex> lck(mutexB);
   while (run) {
@@ -58,6 +63,7 @@ void trackHead(shared_ptr<WebCam> &cam, unique_ptr<HeadTracker> &tracker) {
 }
 
 void sendOutput(shared_ptr<WebCam> &cam) {
+  spdlog::info("Send Output");
   bool run = cam->running;
   std::unique_lock<std::mutex> lck(mutexC);
   while (run) {
