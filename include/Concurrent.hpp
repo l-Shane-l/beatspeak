@@ -1,7 +1,6 @@
 #ifndef concurrent_hpp
 #define concurrent_hpp
 #include "./DataGenerators/HeadTracker.hpp"
-#include "./DataProcessors/DataBatch.hpp"
 #include "./IO/WebCam.hpp"
 #include "opencv2/opencv.hpp"
 #include <algorithm>
@@ -29,4 +28,4 @@ void sendOutput(shared_ptr<WebCam> &cam);
 
 void setUp();
 
-#endif /* Heartbeat_hpp */
+#endif

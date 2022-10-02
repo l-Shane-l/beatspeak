@@ -1,4 +1,5 @@
 #include "../../include/DataGenerators/FacialPointsGenerator.hpp"
+#include "spdlog/spdlog.h"
 
 // logic to setup tracking
 void FacialPointsGenerator::generateMask() {
@@ -25,6 +26,7 @@ void FacialPointsGenerator::trackPoints(vector<Point2f> &newPoints,
     generateMask();
     generateTrackingPoints();
   }
+  spdlog::info("Tracking Points");
   updateTrackedPoints();
   newPoints = currentPoints;
 }
