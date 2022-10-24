@@ -2,6 +2,7 @@
 #define HeadTracker_hpp
 
 #include "../IO/WebCam.hpp"
+#include "../Utilities/LockFreeStack.hpp"
 #include "FacialPointsGenerator.hpp"
 #include "FacialRecogniser.hpp"
 #include "TrackerData.hpp"
@@ -12,7 +13,8 @@ using namespace std;
 struct HeadTracker {
 
 public:
-  HeadTracker() {
+  HeadTracker(shared_ptr<lock_free_queue<Point2f>> queue)
+      : output_queue(move(queue)) {
     shared_ptr<TrackerData> newTrackerData(new TrackerData());
     unique_ptr<FacialPointsGenerator> newPointsGen(
         new FacialPointsGenerator(newTrackerData));
@@ -22,7 +24,6 @@ public:
     trackerData = newTrackerData;
     pointsGen = move(newPointsGen);
     pointsGen->setNumberOfPoints(numOfPoints);
-    // shared_ptr<HeadMovementData> headPos(new HeadMovementData());
   }
 
   void trackHeadInFrame(Mat &img, Mat &gray);
@@ -33,6 +34,7 @@ public:
   Mat frameRGB, frameGray, oldFrame;
 
 private:
+  shared_ptr<lock_free_queue<Point2f>> output_queue;
   int numOfPoints{50};
   vector<Point2f> points;
 };

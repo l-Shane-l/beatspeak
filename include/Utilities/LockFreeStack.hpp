@@ -1,8 +1,9 @@
+#ifndef LockFreeStack_hpp
+#define LockFreeStack_hpp
 #include <atomic>
 #include <iostream>
 #include <memory>
 
-// Single thread producer and single thread consumer lock-free queue
 template <typename T> class lock_free_queue {
 private:
   struct node {
@@ -49,3 +50,5 @@ public:
     tail.store(p);
   }
 };
+
+#endif

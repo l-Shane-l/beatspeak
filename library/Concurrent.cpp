@@ -2,6 +2,7 @@
 #include "spdlog/spdlog.h"
 
 using namespace cv;
+
 promise<bool> prms;
 future<bool> ftr = prms.get_future();
 std::mutex mutexA, mutexB, mutexC;
@@ -21,7 +22,8 @@ int run(int argc, char *argv[]) {
 
   shared_ptr<WebCam> camInputRef(new WebCam(argv[1]));
   shared_ptr<WebCam> camOutputRef = camInputRef;
-  unique_ptr<HeadTracker> tracker(new HeadTracker());
+  shared_ptr<lock_free_queue<Point2f>> data_points_queue{};
+  unique_ptr<HeadTracker> tracker(new HeadTracker(data_points_queue));
 
   std::thread t1(getInput, ref(camInputRef));
   std::thread t2(trackHead, ref(camInputRef), ref(tracker));

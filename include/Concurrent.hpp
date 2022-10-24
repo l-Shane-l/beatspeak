@@ -20,6 +20,7 @@ const int downsample{1};
 const double TIME_BASE{0.001};
 
 using namespace std;
+
 int run(int argc, char *argv[]);
 void fileTest(promise<bool> &&prms);
 void getInput(shared_ptr<WebCam> &cam);
