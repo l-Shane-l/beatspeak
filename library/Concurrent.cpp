@@ -24,7 +24,7 @@ int run(int argc, char *argv[]) {
   shared_ptr<WebCam> camOutputRef = camInputRef;
   shared_ptr<lock_free_queue<Point2f>> data_points_queue(
       new lock_free_queue<Point2f>());
-  data_points_queue->push((cv::Point2f(0.0), cv::Point2f(0.0)));
+
   unique_ptr<HeadTracker> tracker(new HeadTracker(data_points_queue));
   unique_ptr<DataProcessor> processor(new DataProcessor(data_points_queue));
 
@@ -71,7 +71,10 @@ void trackHead(shared_ptr<WebCam> &cam, unique_ptr<HeadTracker> &tracker) {
 
 void processData(unique_ptr<DataProcessor> &processor) {
   spdlog::info("Process Data");
+  processor->setup_log();
+
   for (;;) {
+    processor->log_data();
   }
 }
 
