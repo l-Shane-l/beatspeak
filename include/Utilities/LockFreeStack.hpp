@@ -1,3 +1,5 @@
+#ifndef lock_free_stack_hpp
+#define lock_free_stack_hpp
 #include <atomic>
 #include <iostream>
 #include <memory>
@@ -51,3 +53,5 @@ public:
     tail.store(p);
   }
 };
+
+#endif

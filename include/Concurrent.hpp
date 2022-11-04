@@ -1,6 +1,7 @@
 #ifndef concurrent_hpp
 #define concurrent_hpp
 #include "./DataGenerators/HeadTracker.hpp"
+#include "./DataProcessors/DataProcessor.hpp"
 #include "./IO/WebCam.hpp"
 #include "opencv2/opencv.hpp"
 #include <algorithm>
@@ -26,7 +27,7 @@ void fileTest(promise<bool> &&prms);
 void getInput(shared_ptr<WebCam> &cam);
 void trackHead(shared_ptr<WebCam> &cam, unique_ptr<HeadTracker> &tracker);
 void sendOutput(shared_ptr<WebCam> &cam);
-
+void processData(unique_ptr<DataProcessor> &processor);
 void setUp();
 
 #endif

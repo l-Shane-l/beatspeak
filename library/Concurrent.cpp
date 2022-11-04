@@ -22,19 +22,23 @@ int run(int argc, char *argv[]) {
 
   shared_ptr<WebCam> camInputRef(new WebCam(argv[1]));
   shared_ptr<WebCam> camOutputRef = camInputRef;
-  shared_ptr<lock_free_queue<Point2f>> data_points_queue{
-      make_shared<lock_free_queue<Point2f>>()};
+  shared_ptr<lock_free_queue<Point2f>> data_points_queue(
+      new lock_free_queue<Point2f>());
+  data_points_queue->push((cv::Point2f(0.0), cv::Point2f(0.0)));
   unique_ptr<HeadTracker> tracker(new HeadTracker(data_points_queue));
+  unique_ptr<DataProcessor> processor(new DataProcessor(data_points_queue));
 
-  std::thread t1(getInput, ref(camInputRef));
-  std::thread t2(trackHead, ref(camInputRef), ref(tracker));
-  std::thread t3(sendOutput, ref(camInputRef));
+  thread t1(getInput, ref(camInputRef));
+  thread t2(trackHead, ref(camInputRef), ref(tracker));
+  thread t3(sendOutput, ref(camInputRef));
+  thread t4(processData, ref(processor));
 
   t1.join();
   t2.join();
   t3.join();
+  t4.join();
 
-  cout << "End" << std::endl;
+  spdlog::info("End");
   return 0;
 }
 
@@ -62,6 +66,12 @@ void trackHead(shared_ptr<WebCam> &cam, unique_ptr<HeadTracker> &tracker) {
     string hr = "HeartRate Unknown";
     putText(cam->getframeRGB(), hr, Point(30, 30), FONT_HERSHEY_COMPLEX, 0.8,
             Scalar(0, 0, 255), 1);
+  }
+}
+
+void processData(unique_ptr<DataProcessor> &processor) {
+  spdlog::info("Process Data");
+  for (;;) {
   }
 }
 
