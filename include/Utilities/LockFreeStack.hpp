@@ -1,7 +1,8 @@
-#ifndef LockFreeStack_hpp
-#define LockFreeStack_hpp
 #include <atomic>
 #include <iostream>
+#include <memory>
+
+#include <atomic>
 #include <memory>
 
 template <typename T> class lock_free_queue {
@@ -50,5 +51,3 @@ public:
     tail.store(p);
   }
 };
-
-#endif

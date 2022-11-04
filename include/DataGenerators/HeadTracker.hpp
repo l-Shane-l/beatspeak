@@ -13,8 +13,9 @@ using namespace std;
 struct HeadTracker {
 
 public:
-  HeadTracker(shared_ptr<lock_free_queue<Point2f>> queue)
-      : output_queue(move(queue)) {
+  HeadTracker(shared_ptr<lock_free_queue<Point2f>> queue) {
+    output_queue = move(queue);
+
     shared_ptr<TrackerData> newTrackerData(new TrackerData());
     unique_ptr<FacialPointsGenerator> newPointsGen(
         new FacialPointsGenerator(newTrackerData));
@@ -35,6 +36,7 @@ public:
 
 private:
   shared_ptr<lock_free_queue<Point2f>> output_queue;
+  lock_free_queue<Point2f> *unwrapped;
   int numOfPoints{50};
   vector<Point2f> points;
 };
