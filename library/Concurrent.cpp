@@ -22,8 +22,8 @@ int run(int argc, char *argv[]) {
 
   shared_ptr<WebCam> camInputRef(new WebCam(argv[1]));
   shared_ptr<WebCam> camOutputRef = camInputRef;
-  shared_ptr<lock_free_queue<Point2f>> data_points_queue(
-      new lock_free_queue<Point2f>());
+  shared_ptr<lock_free_queue<vector<Point2f>>> data_points_queue(
+      new lock_free_queue<vector<Point2f>>());
 
   unique_ptr<HeadTracker> tracker(new HeadTracker(data_points_queue));
   unique_ptr<DataProcessor> processor(new DataProcessor(data_points_queue));

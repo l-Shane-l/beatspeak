@@ -43,23 +43,14 @@ void FacialPointsGenerator::updateTrackedPoints() {
     } catch (const exception &e) {
       cout << e.what() << endl;
     }
-    vector<Point2f> tmp;
-    vector<double> tmpY;
-    for (int i = 0; i < trackingStatus.size();
-         i++) { // putting a huge load on the cpu
-      if (trackingStatus[i] == 1) {
-        tmp.push_back(currentPoints[i]);
-        tmpY.push_back(currentPoints[i].y);
-      }
-    }
-
-    prevPoints = tmp;
+    prevPoints = currentPoints;
     Data->oldFrame = Data->frameGray.clone();
     drawPoints();
   } else {
     Data->oldFrame = Data->frameGray.clone();
-    cout << "size miss match" << endl;
-    cout << Data->frameGray.rows << " " << Data->oldFrame.rows << endl;
+    spdlog::info("size miss match");
+    spdlog::info(Data->frameGray.rows);
+    spdlog::info(Data->oldFrame.rows);
   }
 }
 

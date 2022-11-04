@@ -10,7 +10,7 @@ using namespace std;
 using namespace cv;
 struct DataProcessor {
 public:
-  DataProcessor(shared_ptr<lock_free_queue<Point2f>> queue) {
+  DataProcessor(shared_ptr<lock_free_queue<vector<Point2f>>> queue) {
     input_data = move(queue);
     output_file.open("output.dat");
   }
@@ -19,7 +19,7 @@ public:
   void setup_log();
 
 private:
-  shared_ptr<lock_free_queue<Point2f>> input_data;
+  shared_ptr<lock_free_queue<vector<Point2f>>> input_data;
   ofstream output_file;
 };
 

@@ -13,7 +13,7 @@ using namespace std;
 struct HeadTracker {
 
 public:
-  HeadTracker(shared_ptr<lock_free_queue<Point2f>> queue) {
+  HeadTracker(shared_ptr<lock_free_queue<vector<Point2f>>> queue) {
     output_queue = move(queue);
 
     shared_ptr<TrackerData> newTrackerData(new TrackerData());
@@ -35,7 +35,7 @@ public:
   Mat frameRGB, frameGray, oldFrame;
 
 private:
-  shared_ptr<lock_free_queue<Point2f>> output_queue;
+  shared_ptr<lock_free_queue<vector<Point2f>>> output_queue;
   lock_free_queue<Point2f> *unwrapped;
   int numOfPoints{50};
   vector<Point2f> points;
