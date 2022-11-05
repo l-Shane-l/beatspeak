@@ -1,7 +1,7 @@
 #!/usr/bin/gnuplot -persist
-set key autotitle columnheader
-set datafile separator ','
+set key outside
 set key off
-plot for [i=1:1] "../test_data/pre_spline.dat" using 0:i with linespoints; -1 
-plot for [i=1:10] "../test_data/post_spline.dat" using 0:i with linespoints; 
-
+while (1) {
+plot for [col=1:50] '../build/output.dat' using 0:col with lines
+pause(1)
+}
