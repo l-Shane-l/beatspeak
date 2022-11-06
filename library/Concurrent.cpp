@@ -7,7 +7,6 @@ promise<bool> prms;
 future<bool> ftr = prms.get_future();
 std::mutex mutexA, mutexB, mutexC;
 std::condition_variable condA, condB, condC;
-
 int run(int argc, char *argv[]) {
 
   if (argc < 2) {

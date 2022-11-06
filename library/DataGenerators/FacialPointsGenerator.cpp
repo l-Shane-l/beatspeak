@@ -26,7 +26,6 @@ void FacialPointsGenerator::trackPoints(vector<Point2f> &newPoints,
     generateMask();
     generateTrackingPoints();
   }
-  spdlog::info("Tracking Points");
   updateTrackedPoints();
   newPoints = currentPoints;
 }
