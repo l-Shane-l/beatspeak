@@ -73,6 +73,7 @@ void processData(unique_ptr<DataProcessor> &processor) {
   processor->setup_log();
 
   for (;;) {
+    this_thread::sleep_for(std::chrono::milliseconds(1000));
     processor->log_data();
   }
 }

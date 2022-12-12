@@ -2,11 +2,20 @@
 #include "spdlog/spdlog.h"
 
 void DataProcessor::log_data() {
-  auto data = input_data->pop();
-  if (data != NULL) {
-    for_each(data->begin(), data->end(),
-             [&](Point2f x) { output_file << x.y << " "; });
-    output_file << endl;
+  current = chrono::system_clock::now();
+  if (chrono::duration_cast<chrono::seconds>(current - start).count() >= 5) {
+    spdlog::info("Logging Data");
+    start = chrono::system_clock::now();
+  } else {
+    auto dataPoint = input_data->pop();
+    if (dataPoint != NULL) {
+      for_each(dataPoint->begin(), dataPoint->end(), [&](Point2f x) {
+        output_file << x.y << " ";
+        data.push_back(x.y);
+      });
+      output_file << endl;
+      data_transformers.Modal_Dist_Filter(data);
+    }
   }
 }
 
