@@ -14,6 +14,7 @@ void DataProcessor::log_data() {
       spdlog::info("No data to log");
       return;
     }
+    apply_cublic_spline_to_matrix();
     start = chrono::system_clock::now();
     data.clear();
   } else {
@@ -92,9 +93,22 @@ void DataProcessor::find_mode() {
   spdlog::info("Mode: freq " + to_string(max) + "  value " + to_string(mode));
 }
 
-void DataProcessor::apply_cublic_spline() {
-  // apply a cublic spline to the data
-  for_each(data.begin(), data.end(), [&](vector<float> x) {
+void DataProcessor::apply_cublic_spline_to_matrix() {
+  // apply the cubic spline to the data
+  for_each(data.begin(), data.end(),
+           [&](vector<float> &x) { x = apply_cubic_spline(x); });
+  spdlog::info("Applied cubic spline " + to_string(data[0].size()));
+}
+vector<float> DataProcessor::apply_cubic_spline(const vector<float> &x) {
+  // Initialize the vector for the cubic spline
+  vector<float> y(250);
 
-  });
+  // Loop through the elements in the input vector
+  for (int i = 0; i < x.size(); i++) {
+    // Apply the cubic spline formula to each element
+    y[i] = x[i] * x[i] * x[i];
+  }
+
+  // Return the vector with the cubic spline applied
+  return y;
 }

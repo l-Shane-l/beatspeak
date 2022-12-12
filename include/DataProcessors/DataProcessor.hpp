@@ -32,7 +32,8 @@ private:
   void find_max_distances();
   void find_mode();
   void filter_by_mode();
-  void apply_cublic_spline();
+  void apply_cublic_spline_to_matrix();
+  vector<float> apply_cubic_spline(const vector<float> &x);
   int mode = 0;
 };
 
