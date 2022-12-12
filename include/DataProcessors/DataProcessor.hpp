@@ -4,10 +4,12 @@
 #include "./DataTransformers.hpp"
 #include "opencv2/opencv.hpp"
 #include "spdlog/spdlog.h"
+#include <algorithm>
 #include <chrono>
 #include <ctime>
 #include <fstream>
 #include <iostream>
+#include <math.h>
 
 using namespace std;
 using namespace cv;
@@ -34,6 +36,9 @@ private:
   void filter_by_mode();
   void apply_cublic_spline_to_matrix();
   vector<float> apply_cubic_spline(const vector<float> &x);
+  std::vector<float> butterworth_filter_5th_order(std::vector<float> &signal,
+                                                  float f1, float f2);
+  void apply_butterworth_filter();
   int mode = 0;
 };
 
