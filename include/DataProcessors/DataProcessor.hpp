@@ -28,6 +28,12 @@ private:
   ofstream output_file;
   chrono::system_clock::time_point start = chrono::system_clock::now();
   chrono::system_clock::time_point current = chrono::system_clock::now();
+  vector<float> max_distances;
+  void find_max_distances();
+  void find_mode();
+  void filter_by_mode();
+  void apply_cublic_spline();
+  int mode = 0;
 };
 
 #endif
