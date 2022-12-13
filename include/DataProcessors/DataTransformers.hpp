@@ -15,17 +15,9 @@ using namespace std;
 using namespace cv;
 
 struct DataTransformers {
-  double modal_dist;
-  vector<int> max_dist;
-  vector<int> modalTracker;
-
-  void Modal_Dist_Filter(vector<float> &points);
-  void Butterworth_Filter(vector<float> &points);
-  void Add_Spline(vector<float> &points);
-  void PCA();
+  vector<float> PCA(vector<vector<float>> data);
 
 private:
-  float findMode(vector<float> &points);
 };
 
 #endif

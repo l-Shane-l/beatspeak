@@ -1,4 +1,5 @@
 #include "../../include/DataProcessors/DataProcessor.hpp"
+#include "spdlog/fmt/ostr.h"
 #include "spdlog/spdlog.h"
 
 void DataProcessor::log_data() {
@@ -15,8 +16,17 @@ void DataProcessor::log_data() {
       spdlog::info("No data to log");
       return;
     }
-    apply_cublic_spline_to_matrix();
-    apply_butterworth_filter();
+    // apply_cublic_spline_to_matrix();
+    // apply_butterworth_filter();
+    spdlog::info(" data shape " + to_string(data.size()) + "S " +
+                 to_string(data[0].size()));
+    principal_components = data_transformer.PCA(data);
+    spdlog::info("Principal Components " +
+                 to_string(principal_components.size()));
+    int i = 0;
+    for_each(principal_components.begin(), principal_components.end(),
+             [&](float x) { result_file << x << endl; });
+    result_file << endl;
     start = chrono::system_clock::now();
     data.clear();
   } else {

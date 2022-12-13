@@ -18,8 +18,12 @@ public:
   DataProcessor(shared_ptr<lock_free_queue<vector<Point2f>>> queue) {
     input_data = move(queue);
     output_file.open("output.dat");
+    result_file.open("result.dat");
   }
-  ~DataProcessor() { output_file.close(); }
+  ~DataProcessor() {
+    output_file.close();
+    result_file.close();
+  }
   void log_data();
   void setup_log();
 
@@ -28,6 +32,7 @@ private:
   shared_ptr<lock_free_queue<vector<Point2f>>> input_data;
   vector<vector<float>> data;
   ofstream output_file;
+  ofstream result_file;
   chrono::system_clock::time_point start = chrono::system_clock::now();
   chrono::system_clock::time_point current = chrono::system_clock::now();
   vector<float> max_distances;
@@ -39,7 +44,9 @@ private:
   std::vector<float> butterworth_filter_5th_order(std::vector<float> &signal,
                                                   float f1, float f2);
   void apply_butterworth_filter();
+  vector<float> principal_components;
   int mode = 0;
+  DataTransformers data_transformer;
 };
 
 #endif
