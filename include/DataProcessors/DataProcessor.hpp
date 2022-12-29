@@ -1,7 +1,9 @@
 #ifndef DataProcessor_hpp
 #define DataProcessor_hpp
 #include "../Utilities/LockFreeStack.hpp"
+#include "../Utilities/spline.h"
 #include "./DataTransformers.hpp"
+
 #include "opencv2/opencv.hpp"
 #include "spdlog/spdlog.h"
 #include <algorithm>
@@ -9,7 +11,6 @@
 #include <ctime>
 #include <fstream>
 #include <iostream>
-#include <math.h>
 
 using namespace std;
 using namespace cv;
@@ -18,12 +19,8 @@ public:
   DataProcessor(shared_ptr<lock_free_queue<vector<Point2f>>> queue) {
     input_data = move(queue);
     output_file.open("output.dat");
-    result_file.open("result.dat");
   }
-  ~DataProcessor() {
-    output_file.close();
-    result_file.close();
-  }
+  ~DataProcessor() { output_file.close(); }
   void log_data();
   void setup_log();
 
@@ -33,6 +30,7 @@ private:
   vector<vector<float>> data;
   ofstream output_file;
   ofstream result_file;
+  int time_interval = 3;
   chrono::system_clock::time_point start = chrono::system_clock::now();
   chrono::system_clock::time_point current = chrono::system_clock::now();
   vector<float> max_distances;

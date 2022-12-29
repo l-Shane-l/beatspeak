@@ -4,11 +4,12 @@
 
 void DataProcessor::log_data() {
   current = chrono::system_clock::now();
-  if (chrono::duration_cast<chrono::seconds>(current - start).count() >= 5) {
-    spdlog::info("Logging Data " + to_string(data.size()) + " " +
-                 to_string(data[0].size()));
+  if (chrono::duration_cast<chrono::seconds>(current - start).count() >=
+      time_interval) {
+    // spdlog::info("Logging Data " + to_string(data.size()) + " " +
+    //              to_string(data[0].size()));
     find_max_distances();
-    spdlog::info(max_distances[0]);
+    // spdlog::info(max_distances[0]);
     find_mode();
     filter_by_mode();
 
@@ -16,19 +17,24 @@ void DataProcessor::log_data() {
       spdlog::info("No data to log");
       return;
     }
-    // apply_cublic_spline_to_matrix();
-    // apply_butterworth_filter();
+    apply_cublic_spline_to_matrix();
+    apply_butterworth_filter();
     spdlog::info(" data shape " + to_string(data.size()) + "S " +
                  to_string(data[0].size()));
-    principal_components = data_transformer.PCA(data);
-    spdlog::info("Principal Components " +
-                 to_string(principal_components.size()));
-    int i = 0;
-    for_each(principal_components.begin(), principal_components.end(),
-             [&](float x) { result_file << x << endl; });
-    result_file << endl;
-    start = chrono::system_clock::now();
+    // principal_components = data_transformer.PCA(data);
+    // spdlog::info("Principal Components " +
+    //              to_string(principal_components.size()));
+    // int i = 0;
+
+    // result_file.open("result.dat");
+    // float placeholder = 0;
+    // result_file << placeholder << endl;
+    // for_each(principal_components.begin(), principal_components.end(),
+    //          [&](float x) { result_file << x << endl; });
+    // result_file.close();
     data.clear();
+    start = chrono::system_clock::now();
+
   } else {
     auto dataPoint = input_data->pop();
     if (dataPoint != NULL) {
@@ -111,18 +117,26 @@ void DataProcessor::apply_cublic_spline_to_matrix() {
            [&](vector<float> &x) { x = apply_cubic_spline(x); });
   spdlog::info("Applied cubic spline " + to_string(data[0].size()));
 }
-vector<float> DataProcessor::apply_cubic_spline(const vector<float> &x) {
-  // Initialize the vector for the cubic spline
-  vector<float> y(250);
+// Function to apply a cubic spline to a vector of values
+std::vector<float>
+DataProcessor::apply_cubic_spline(const std::vector<float> &y) {
+  int n = y.size();
+  int output_size = 250 * time_interval;
+  std::vector<float> yi(output_size); // Output spline values
+  std::vector<double> x(n);
+  // Set up the spline object
+  tk::spline s;
+  for (int i = 0; i < n; ++i) {
+    x[i] = i;
+  }
+  s.set_points(x, std::vector<double>(y.begin(), y.end()));
 
-  // Loop through the elements in the input vector
-  for (int i = 0; i < x.size(); i++) {
-    // Apply the cubic spline formula to each element
-    y[i] = x[i] * x[i] * x[i];
+  // Evaluate the spline at the desired output points
+  for (int i = 0; i < output_size; ++i) {
+    yi[i] = s(i);
   }
 
-  // Return the vector with the cubic spline applied
-  return y;
+  return yi;
 }
 
 void DataProcessor::apply_butterworth_filter() {

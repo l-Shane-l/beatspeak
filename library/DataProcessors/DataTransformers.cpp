@@ -1,5 +1,6 @@
 #include "../../include/DataProcessors/DataTransformers.hpp"
 #include "eigen3/Eigen/Dense"
+#include "eigen3/Eigen/Eigenvalues"
 #include "spdlog/fmt/ostr.h"
 #include "spdlog/spdlog.h"
 #include <iostream>
@@ -18,6 +19,7 @@ vector<float> DataTransformers::PCA(vector<vector<float>> data) {
       mat(i, j) = data[i][j];
     }
   }
+  auto untouched = mat;
 
   // Compute the mean of the matrix
   VectorXf mean = mat.colwise().mean();
@@ -37,10 +39,8 @@ vector<float> DataTransformers::PCA(vector<vector<float>> data) {
 
   // Print the eigenvalues and eigenvectors
   auto values = eigensolver.eigenvalues();
-  // auto vectors = eigensolver.eigenvectors();
-  vector<float> return_values;
-  for_each(values.data(), values.data() + values.size(),
-           [&](float x) { return_values.push_back(x); });
-
-  return return_values;
+  auto vectors = eigensolver.eigenvectors();
+  auto selectedVector = vectors.col(0);
+  VectorXf reduced = untouched * selectedVector;
+  return vector<float>(reduced.begin(), reduced.end());
 }
