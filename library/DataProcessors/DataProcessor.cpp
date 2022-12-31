@@ -32,7 +32,7 @@ void DataProcessor::log_data() {
     int mutiple = 60 / time_interval;
     int heartrate = countPeaks(principal_components) * mutiple;
     spdlog::info("Heartrate is " + to_string(heartrate));
-    // result_file.open("result.dat");
+    result_file.open("result.dat");
     float placeholder = 0;
     result_file << placeholder << endl;
     for_each(principal_components.begin(), principal_components.end(),
@@ -200,5 +200,5 @@ int DataProcessor::countPeaks(const std::vector<float> stream) {
     }
   }
   spdlog::info("Peaks: " + to_string(peaks));
-  return peaks;
+  return peaks / 2;
 }

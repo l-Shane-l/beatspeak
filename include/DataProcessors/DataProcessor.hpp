@@ -31,7 +31,7 @@ private:
   ofstream output_file;
   ofstream result_file;
   ofstream post_filter;
-  int time_interval = 3;
+  int time_interval = 4;
   chrono::system_clock::time_point start = chrono::system_clock::now();
   chrono::system_clock::time_point current = chrono::system_clock::now();
   vector<float> max_distances;
