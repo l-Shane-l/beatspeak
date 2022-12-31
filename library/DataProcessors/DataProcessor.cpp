@@ -9,7 +9,7 @@ void DataProcessor::log_data() {
     // spdlog::info("Logging Data " + to_string(data.size()) + " " +
     //              to_string(data[0].size()));
     find_max_distances();
-    // spdlog::info(max_distances[0]);
+    spdlog::info(max_distances[0]);
     find_mode();
     filter_by_mode();
 
@@ -19,22 +19,27 @@ void DataProcessor::log_data() {
     }
     apply_cublic_spline_to_matrix();
     apply_butterworth_filter();
-    spdlog::info(" data shape " + to_string(data.size()) + "S " +
-                 to_string(data[0].size()));
-    // principal_components = data_transformer.PCA(data);
-    // spdlog::info("Principal Components " +
-    //              to_string(principal_components.size()));
-    // int i = 0;
+    // post_filter.open("post_filter.dat");
+    // for_each(data[0].begin(), data[0].end(),
+    //          [&](float y) { post_filter << y << " "; });
+    // post_filter << endl;
+    // post_filter.close();
 
+    // spdlog::info(" data shape " + to_string(data.size()) + "S " +
+    //              to_string(data[0].size()));
+    principal_components = data_transformer.PCA(data);
+    int i = 0;
+    int mutiple = 60 / time_interval;
+    int heartrate = countPeaks(principal_components) * mutiple;
+    spdlog::info("Heartrate is " + to_string(heartrate));
     // result_file.open("result.dat");
-    // float placeholder = 0;
-    // result_file << placeholder << endl;
-    // for_each(principal_components.begin(), principal_components.end(),
-    //          [&](float x) { result_file << x << endl; });
-    // result_file.close();
+    float placeholder = 0;
+    result_file << placeholder << endl;
+    for_each(principal_components.begin(), principal_components.end(),
+             [&](float x) { result_file << x << endl; });
+    result_file.close();
     data.clear();
     start = chrono::system_clock::now();
-
   } else {
     auto dataPoint = input_data->pop();
     if (dataPoint != NULL) {
@@ -149,42 +154,51 @@ void DataProcessor::apply_butterworth_filter() {
 
 std::vector<float>
 DataProcessor::butterworth_filter_5th_order(std::vector<float> &signal,
-                                            float f1, float f2) {
-  int N = 5; // filter order
-  float Wc1 = 2.0 * M_PI * f1;
-  float Wc2 = 2.0 * M_PI * f2;
-  float b[N + 1], a[N + 1];
+                                            float fs, float fc) {
+  // Compute the filter coefficients
+  float wc = 2 * M_PI * fc / fs;
+  float alpha = sin(wc) / (2 * 5); // 5 is the filter order
 
-  // calculate filter coefficients
-  float Wc0 = sqrt(Wc1 * Wc2);
-  float alpha = (Wc2 - Wc1) / (2.0 * tan(M_PI * (Wc2 - Wc1) / (2.0 * Wc0)));
-  float k = Wc0 * tan(M_PI * (Wc2 - Wc1) / (2.0 * Wc0));
-  float K = k * k + alpha * alpha + 2.0 * alpha * k;
-  b[0] = k * k / K;
-  b[1] = 2.0 * b[0];
-  b[2] = b[0];
-  b[3] = 2.0 * (k * k - alpha * alpha) / K;
-  b[4] = (k * k - 2.0 * alpha * k + alpha * alpha) / K;
-  b[5] = 0.0;
-  a[0] = 1.0;
-  a[1] = 2.0 * (alpha * alpha - k * k) / K;
-  a[2] = (k * k - 2.0 * alpha * k + alpha * alpha) / K;
-  a[3] = 2.0 * (k * k - alpha * alpha) / K;
-  a[4] = (k * k + alpha * alpha - 2.0 * alpha * k) / K;
-  a[5] = (k * k + alpha * alpha + 2.0 * alpha * k) / K;
+  // Create the filter transfer function
+  std::vector<float> b(3), a(3);
+  b[0] = 1 + alpha;
+  b[1] = -2 * cos(wc);
+  b[2] = 1 - alpha;
+  a[0] = 1;
+  a[1] = -2 * cos(wc);
+  a[2] = 1;
 
-  // apply filter
-  int size = signal.size();
-  std::vector<float> y(size);
-  for (int n = 0; n < size; n++) {
-    float out = 0.0;
-    for (int i = 0; i < N + 1; i++) {
-      int j = n - i;
-      float in = (j < 0) ? 0.0 : signal[j];
-      out += b[i] * in - a[i] * y[j];
-    }
-    y[n] = out;
+  // Apply the filter to the signal
+  std::vector<float> filtered(signal.size());
+  filtered[0] = (b[0] * signal[0] + b[1] * signal[1] + b[2] * signal[2]) / a[0];
+  for (int i = 1; i < signal.size() - 1; i++) {
+    filtered[i] =
+        (b[0] * signal[i] + b[1] * signal[i - 1] + b[2] * signal[i - 2] -
+         a[1] * filtered[i - 1] - a[2] * filtered[i - 2]) /
+        a[0];
   }
+  filtered[signal.size() - 1] =
+      (b[0] * signal[signal.size() - 1] + b[1] * signal[signal.size() - 2] +
+       b[2] * signal[signal.size() - 3] - a[1] * filtered[signal.size() - 2] -
+       a[2] * filtered[signal.size() - 3]) /
+      a[0];
 
-  return y;
+  // Replace the original signal with the filtered signal
+  signal = filtered;
+  return signal;
+}
+
+int DataProcessor::countPeaks(const std::vector<float> stream) {
+  // Initialize the peak count
+  int peaks = 0;
+
+  // Iterate through the stream and count the number of zero crossings
+  for (int i = 1; i < stream.size() - 1; i++) {
+    if ((stream[i] > stream[i - 1] && stream[i] > stream[i + 1]) ||
+        (stream[i] < stream[i - 1] && stream[i] < stream[i + 1])) {
+      peaks++;
+    }
+  }
+  spdlog::info("Peaks: " + to_string(peaks));
+  return peaks;
 }
