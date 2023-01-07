@@ -174,5 +174,5 @@ int DataTransformers::countPeaks(const std::vector<float> stream) {
     }
   }
   spdlog::info("Peaks: " + to_string(peaks));
-  return peaks / 2;
+  return peaks;
 }

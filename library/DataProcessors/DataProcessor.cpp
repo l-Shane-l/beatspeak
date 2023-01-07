@@ -8,7 +8,7 @@ void DataProcessor::log_data() {
   if (chrono::duration_cast<chrono::seconds>(current - start).count() >=
       time_interval) {
     start = chrono::system_clock::now();
-    thread([&]() { process_data(); }).detach();
+    process_data();
 
   } else {
     auto dataPoint = input_data->pop();
@@ -24,8 +24,6 @@ void DataProcessor::log_data() {
       });
 
       output_file << endl;
-      // sleep
-      // this_thread::sleep_for(chrono::seconds(1));
     }
   }
 }

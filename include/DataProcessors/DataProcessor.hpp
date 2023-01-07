@@ -27,7 +27,7 @@ public:
   void process_data();
 
 private:
-  int time_interval = 10;
+  int time_interval = 5;
   vector<vector<float>> data;
 
   shared_ptr<lock_free_queue<vector<Point2f>>> input_data;

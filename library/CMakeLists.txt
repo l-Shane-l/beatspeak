@@ -1,7 +1,6 @@
 set( OpenCV_DIR "C:/Users/shane/Documents/GitHub/opencv/static-build" )
 set(OpenCV_STATIC ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON) 
-set(CMAKE_CXX_CLANG_TIDY "clang-tidy;-p=${CMAKE_BINARY_DIR},-config=")
 set(CMAKE_CXX_STANDARD 20)
 find_package( OpenCV REQUIRED)
 find_package (Threads)
