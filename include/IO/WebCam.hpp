@@ -19,7 +19,7 @@ struct WebCam {
         exit(0);
       }
     } else if (settings == "cam") {
-      cap.open(2);
+      cap.open(0);
       cap.set(CAP_PROP_BUFFERSIZE, 2);
       std::cout << "Camera Found" << std::endl;
       if (!cap.isOpened()) {

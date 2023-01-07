@@ -3,3 +3,5 @@ build/*
 venv/
 source/*
 *.dat
+*.data
+*.data.old

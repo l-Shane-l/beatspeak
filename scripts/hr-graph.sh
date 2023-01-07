@@ -2,6 +2,6 @@
 set key outside
 set key off
 while (1) {
-plot '../build/result.dat' with lines
+plot 'result.dat' with lines
 pause(1)
 }
