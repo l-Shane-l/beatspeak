@@ -18,19 +18,23 @@
 #include <thread>
 #include <vector>
 
+
+
 using namespace std;
 using namespace cv;
+using namespace Eigen;
 
 struct DataTransformers {
-  DataTransformers() { time_interval = 4; }
+  DataTransformers() { time_interval = 10; }
   DataTransformers(int time_interval, vector<vector<float>> data)
       : time_interval(time_interval), dataBatch(data) {}
   vector<float> PCA(vector<vector<float>> data);
-
+  int getMostPeriodicSignal(MatrixXf& mat, BDCSVD<MatrixXf>& svd);
   void find_max_distances();
   void find_mode();
   void filter_by_mode();
   void apply_cublic_spline_to_matrix();
+  
   vector<float> apply_cubic_spline(const vector<float> &x);
   std::vector<float> butterworth_filter_5th_order(std::vector<float> &signal,
                                                   float f1, float f2);
@@ -38,7 +42,7 @@ struct DataTransformers {
   int countPeaks(const std::vector<float> stream);
   vector<float> max_distances;
   vector<vector<float>> dataBatch;
-  vector<float> principal_components;
+  vector<vector<float>> principal_components;
   int mode = 0;
   int time_interval; // set in constructor
 };

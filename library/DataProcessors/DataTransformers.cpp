@@ -1,11 +1,65 @@
 #include "../../include/DataProcessors/DataTransformers.hpp"
 
-using namespace Eigen;
+#include <fftw3.h>
 using namespace std;
+
+int DataTransformers::getMostPeriodicSignal(MatrixXf& mat, BDCSVD<MatrixXf>& svd) {
+    int max_index = 0;
+    float max_power = 0;
+    for (int i = 0; i < svd.singularValues().size(); i++) {
+        // Transform the data onto the new 1-dimensional space
+        MatrixXf transformed = mat * svd.matrixV().col(i);
+
+        // Allocate memory for the input and output arrays
+        int rows = transformed.rows();
+        int cols = transformed.cols();
+        double* input = fftw_alloc_real(rows * cols);
+        fftw_complex* output = fftw_alloc_complex(rows * (cols/2+1));
+
+        // Copy the data from the Eigen matrix to the input array
+        for (int j = 0; j < rows; j++) {
+            for (int k = 0; k < cols; k++) {
+                input[j*cols + k] = transformed(j, k);
+            }
+        }
+
+        // Create the plan and execute the FFT
+        fftw_plan plan = fftw_plan_dft_r2c_2d(rows, cols, input, output, FFTW_ESTIMATE);
+        fftw_execute(plan);
+
+        // Calculate the power spectral density
+        VectorXf psd(rows * (cols/2+1));
+        for (int j = 0; j < rows; j++) {
+            for (int k = 0; k < cols/2+1; k++) {
+                double re = output[j*(cols/2+1) + k][0];
+                double im = output[j*(cols/2+1) + k][1];
+                psd(j*(cols/2+1) + k) = re*re + im*im;
+            }
+        }
+        psd /= (rows*cols);
+
+        // Find the index of the first harmonic
+        int first_harmonic = psd.size()/2;
+        // Calculate the total power
+        float total_power = psd.sum();
+        // Calculate the percentage of power in the first harmonic
+        float power_in_first_harmonic = psd[first_harmonic] / total_power;
+        // Keep track of the signal with the highest percentage of power in the first harmonic
+        if (power_in_first_harmonic > max_power) {
+            max_index = i;
+            max_power = power_in_first_harmonic;
+        }
+
+        // Cleanup
+        fftw_destroy_plan(plan);
+        fftw_free(input);
+        fftw_free(output);
+    }
+    return max_index;
+}
 
 // Function to carry out PCA on a vector of vectors of floats
 vector<float> DataTransformers::PCA(vector<vector<float>> data) {
-  spdlog::info("Performing PCA on data");
   // Convert the vector of vectors into an Eigen matrix
   MatrixXf mat(data.size(), data[0].size());
   for (int i = 0; i < data.size(); i++) {
@@ -13,30 +67,28 @@ vector<float> DataTransformers::PCA(vector<vector<float>> data) {
       mat(i, j) = data[i][j];
     }
   }
-  auto untouched = mat;
 
-  // Compute the mean of the matrix
+  // Standardize the data
   VectorXf mean = mat.colwise().mean();
-
-  // Subtract the mean from each column of the matrix
   mat = mat.rowwise() - mean.transpose();
+  VectorXf stddev = mat.colwise().norm() / sqrt(mat.rows() - 1);
+  mat = mat.array().rowwise() / stddev.transpose().array();
 
-  // Compute the covariance matrix
-  MatrixXf cov = (mat.transpose() * mat) / float(mat.rows() - 1);
+  // Perform SVD
+  BDCSVD<MatrixXf> svd(mat, ComputeThinU | ComputeThinV);
 
-  // Compute the eigenvalues and eigenvectors of the covariance matrix
-  SelfAdjointEigenSolver<MatrixXf> eigensolver(cov);
-  if (eigensolver.info() != Success) {
-    spdlog::info("Failed to compute eigenvalues and eigenvectors");
-    return {};
-  }
+  // Call the function that returns the index of the most periodic signal
+  int max_index = getMostPeriodicSignal(mat, svd);
 
-  // Print the eigenvalues and eigenvectors
-  auto values = eigensolver.eigenvalues();
-  auto vectors = eigensolver.eigenvectors();
-  auto selectedVector = vectors.col(0);
-  VectorXf reduced = untouched * selectedVector;
-  return vector<float>(reduced.begin(), reduced.end());
+  // Get the eigenvector corresponding to the most periodic signal
+  MatrixXf eigenvector = svd.matrixV().col(max_index);
+
+  // Transform the data onto the new 1-dimensional space
+  MatrixXf transformed = mat * eigenvector;
+
+  // Convert the transformed data back to a vector
+  return vector<float>(transformed.data(),
+                       transformed.data() + transformed.size());
 }
 
 void DataTransformers::find_max_distances() {
@@ -162,17 +214,24 @@ DataTransformers::butterworth_filter_5th_order(std::vector<float> &signal,
 }
 
 int DataTransformers::countPeaks(const std::vector<float> stream) {
-  // Initialize the peak count
-  spdlog::info("Counting peaks");
-  int peaks = 0;
+    // Initialize the peak count
+    int peaks = 0;
 
-  // Iterate through the stream and count the number of zero crossings
-  for (int i = 1; i < stream.size() - 1; i++) {
-    if ((stream[i] > stream[i - 1] && stream[i] > stream[i + 1]) ||
-        (stream[i] < stream[i - 1] && stream[i] < stream[i + 1])) {
-      peaks++;
+    // Check for peak at the first data point
+    if ((stream[0] > stream[1]) || (stream[0] < stream[1])) {
+        peaks++;
     }
-  }
-  spdlog::info("Peaks: " + to_string(peaks));
-  return peaks;
+
+    // Iterate through the stream and count the number of zero crossings
+    for (int i = 1; i < stream.size() - 1; i++) {
+        if ((stream[i] > stream[i - 1] && stream[i] > stream[i + 1]) ||
+            (stream[i] < stream[i - 1] && stream[i] < stream[i + 1])) {
+            peaks++;
+        }
+    }
+    // Check for peak at the last data point
+    if ((stream[stream.size()-1] > stream[stream.size()-2]) || (stream[stream.size()-1] < stream[stream.size()-2])) {
+        peaks++;
+    }
+    return peaks;
 }

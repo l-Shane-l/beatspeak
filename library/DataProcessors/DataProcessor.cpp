@@ -1,5 +1,5 @@
 #include "../../include/DataProcessors/DataProcessor.hpp"
-#include "../include/Concurrent.hpp"
+
 #include "spdlog/fmt/ostr.h"
 #include "spdlog/spdlog.h"
 
@@ -61,22 +61,18 @@ void DataProcessor::process_data() {
   // spdlog::info(" data shape " + to_string(data.size()) + "S " +
   //              to_string(data[0].size()));
   spdlog::info("applying pca");
-  data_transformers.principal_components =
-      data_transformers.PCA(data_transformers.dataBatch);
+  auto component = data_transformers.PCA(data_transformers.dataBatch);
   spdlog::info("pca finished");
   int mutiple = 60 / time_interval;
 
-  int heartrate =
-      data_transformers.countPeaks(data_transformers.principal_components) *
-      mutiple;
-  spdlog::info("Heartrate is " + to_string(heartrate));
+  int heartrate = data_transformers.countPeaks(component) * mutiple;
+
+  spdlog::info("Heartrates is " + to_string(heartrate) + " bpm");
   result_file.open("result.dat");
   float placeholder = 0;
   result_file << placeholder << endl;
-  for_each(data_transformers.principal_components.begin(),
-           data_transformers.principal_components.end(),
+  for_each(component.begin(), component.end(),
            [&](float x) { result_file << x << endl; });
-  data_transformers.countPeaks(data_transformers.principal_components);
   result_file.close();
   start = chrono::system_clock::now();
 }

@@ -36,7 +36,7 @@ public:
 
 private:
   shared_ptr<lock_free_queue<vector<Point2f>>> output_queue;
-  int numOfPoints{50};
+  int numOfPoints{150};
   vector<Point2f> points;
 };
 
