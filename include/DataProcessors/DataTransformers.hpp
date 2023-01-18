@@ -25,24 +25,31 @@ using namespace cv;
 using namespace Eigen;
 
 struct DataTransformers {
-  DataTransformers() { time_interval = 10; }
+  DataTransformers() { time_interval = 60; }
   DataTransformers(int time_interval, vector<vector<float>> data)
       : time_interval(time_interval), dataBatch(data) {}
   vector<float> PCA(vector<vector<float>> data);
   int getMostPeriodicSignal(MatrixXf& mat, BDCSVD<MatrixXf>& svd);
-  void find_max_distances();
-  void find_mode();
-  void filter_by_mode();
-  void apply_cublic_spline_to_matrix();
+void filter_by_mode(std::vector<std::vector<float>> &dataBatch);
+  void apply_cubic_spline_to_matrix();
   
-  vector<float> apply_cubic_spline(const vector<float> &x);
-  std::vector<float> butterworth_filter_5th_order(std::vector<float> &signal,
+  void apply_cubic_spline(std::vector<float> &y);
+  std::vector<float>& low_pass_filter_5th_order(std::vector<float> &signal,
                                                   float f1, float f2);
-  void apply_butterworth_filter();
+  
   int countPeaks(const std::vector<float> stream);
   vector<float> max_distances;
   vector<vector<float>> dataBatch;
+  void apply_kalman_filter(std::vector<std::vector<float>>& dataBatch);
+  void apply_band_pass_filter(std::vector<std::vector<float>>& dataBatch);
+
   vector<vector<float>> principal_components;
+  void center_and_scale(vector<vector<float>> &data);
+  vector<float>& apply_kalman_filter(std::vector<float> &signal, float process_noise, float measurement_noise);
+vector<float> butterworth_filter_5th_order(std::vector<float> &signal,
+                                               float fs, float fc);
+  vector<float> band_pass_filter(std::vector<float> signal, float low_cut, float high_cut);
+  
   int mode = 0;
   int time_interval; // set in constructor
 };

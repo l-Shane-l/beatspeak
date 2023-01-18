@@ -39,27 +39,25 @@ void DataProcessor::setup_log() {
 
 void DataProcessor::process_data() {
   DataTransformers data_transformers(time_interval, data);
-  // spdlog::info("Logging Data " + to_string(data.size()) + " " +
-  //              to_string(data[0].size()));
-  data_transformers.find_max_distances();
-  spdlog::info(data_transformers.max_distances[0]);
-  data_transformers.find_mode();
-  data_transformers.filter_by_mode();
+  data_transformers.apply_cubic_spline_to_matrix();
+  // data_transformers.center_and_scale(data_transformers.dataBatch);
+  data_transformers.filter_by_mode(data_transformers.dataBatch);
+
 
   if (data_transformers.dataBatch.size() == 0) {
     spdlog::info("No data to log");
     return;
   }
-  data_transformers.apply_cublic_spline_to_matrix();
-  data_transformers.apply_butterworth_filter();
-  // post_filter.open("post_filter.dat");
-  // for_each(data[0].begin(), data[0].end(),
-  //          [&](float y) { post_filter << y << " "; });
-  // post_filter << endl;
-  // post_filter.close();
+  
 
-  // spdlog::info(" data shape " + to_string(data.size()) + "S " +
-  //              to_string(data[0].size()));
+  data_transformers.apply_kalman_filter(data_transformers.dataBatch);
+  data_transformers.apply_band_pass_filter(data_transformers.dataBatch);
+  for (auto &row : data_transformers.dataBatch) {
+        for(auto &val : row) {
+            post_filter << val << " ";
+        }
+        post_filter << endl;
+    }
   spdlog::info("applying pca");
   auto component = data_transformers.PCA(data_transformers.dataBatch);
   spdlog::info("pca finished");

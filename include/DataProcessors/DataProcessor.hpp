@@ -20,14 +20,15 @@ public:
   DataProcessor(shared_ptr<lock_free_queue<vector<Point2f>>> queue) {
     input_data = move(queue);
     output_file.open("output.dat");
+    post_filter.open("post_filter.txt");
   }
-  ~DataProcessor() { output_file.close(); }
+  ~DataProcessor() { output_file.close(); post_filter.close();}
   void log_data();
   void setup_log();
   void process_data();
 
 private:
-  int time_interval = 20;
+  int time_interval = 60;
   vector<vector<float>> data;
 
   shared_ptr<lock_free_queue<vector<Point2f>>> input_data;

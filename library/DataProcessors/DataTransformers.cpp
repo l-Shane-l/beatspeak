@@ -1,6 +1,7 @@
 #include "../../include/DataProcessors/DataTransformers.hpp"
 
 #include <fftw3.h>
+
 using namespace std;
 
 int DataTransformers::getMostPeriodicSignal(MatrixXf& mat, BDCSVD<MatrixXf>& svd) {
@@ -91,90 +92,140 @@ vector<float> DataTransformers::PCA(vector<vector<float>> data) {
                        transformed.data() + transformed.size());
 }
 
-void DataTransformers::find_max_distances() {
-  max_distances.clear();
-  for_each(dataBatch.begin(), dataBatch.end(), [&](vector<float> x) {
-    float max = 0;
-    for (int i = 0; i < x.size() - 1; i++) {
-      float distance = abs(x[i] - x[i + 1]);
-      if (distance > max) {
-        max = distance;
-      }
-    };
-    max_distances.push_back(max);
-  });
-}
-
-void DataTransformers::filter_by_mode() {
-  // filter out the data that is not the mode
-  int removed = 0;
-  for (int i = 0; i < dataBatch.size(); i++) {
-    if (max_distances[i] > mode) {
-      dataBatch.erase(dataBatch.begin() + i);
-      removed++;
-      max_distances.erase(max_distances.begin() + i);
-      i--;
+void DataTransformers::filter_by_mode(std::vector<std::vector<float>> &dataBatch) {
+    // Find the max distances for each point
+    std::vector<float> max_distances;
+    for (auto const& point : dataBatch) {
+        std::vector<float> differences;
+        std::adjacent_difference(point.begin(), point.end(), std::back_inserter(differences));
+        max_distances.push_back(*std::max_element(differences.begin(), differences.end()));
     }
-  }
-  spdlog::info("Removed " + to_string(removed) + " points " +
-               to_string(dataBatch.size()) + " remaining");
-}
 
-void DataTransformers::find_mode() {
-  // find the mode of the max distances
-  spdlog::info("Finding mode");
-  map<int, int> count;
-  int max = 0;
+    // Find the mode of the max distances
+    std::nth_element(max_distances.begin(), max_distances.begin() + max_distances.size() / 2, max_distances.end());
+    float mode = max_distances[max_distances.size() / 2];
 
-  for_each(max_distances.begin(), max_distances.end(), [&](float y) {
-    int x = (int)(round(y));
-    if (count.find(x) == count.end()) {
-      count[x] = 1;
-    } else {
-      count[x] += 1;
-      if (count[x] > max) {
-        max = count[x];
-        mode = x;
-      };
+    // Filter out the data that is not the mode
+    int removed = 0;
+    for (int i = 0; i < dataBatch.size(); i++) {
+        if (max_distances[i] > mode) {
+            dataBatch.erase(dataBatch.begin() + i);
+            removed++;
+            max_distances.erase(max_distances.begin() + i);
+            i--;
+        }
     }
-  });
-  spdlog::info("Mode: freq " + to_string(max) + "  value " + to_string(mode));
+    std::cout << "Removed " << removed << " points " << dataBatch.size() << " remaining" << std::endl;
 }
-
-void DataTransformers::apply_cublic_spline_to_matrix() {
+void DataTransformers::apply_cubic_spline_to_matrix() {
   // apply the cubic spline to the data
-  for_each(dataBatch.begin(), dataBatch.end(),
-           [&](vector<float> &x) { x = apply_cubic_spline(x); });
+  for (auto& x : dataBatch) {
+    apply_cubic_spline(x);
+  }
   spdlog::info("Applied cubic spline " + to_string(dataBatch[0].size()));
 }
+
 // Function to apply a cubic spline to a vector of values
-std::vector<float>
-DataTransformers::apply_cubic_spline(const std::vector<float> &y) {
-  int n = y.size();
-  int output_size = 250 * time_interval;
-  std::vector<float> yi(output_size); // Output spline values
-  std::vector<double> x(n);
+void DataTransformers::apply_cubic_spline(std::vector<float> &y) {
+  int current_sampling_rate = dataBatch.size() / time_interval;
+  int output_size = 250 * y.size() / current_sampling_rate;
+  y.resize(output_size);
+  std::vector<double> x(output_size);
+
   // Set up the spline object
   tk::spline s;
-  for (int i = 0; i < n; ++i) {
-    x[i] = i;
-  }
+  std::iota(x.begin(), x.end(), 0);
   s.set_points(x, std::vector<double>(y.begin(), y.end()));
 
   // Evaluate the spline at the desired output points
   for (int i = 0; i < output_size; ++i) {
-    yi[i] = s(i);
+    y[i] = s((double)i * current_sampling_rate / 250);
   }
-
-  return yi;
 }
 
-void DataTransformers::apply_butterworth_filter() {
-  // apply the butterworth filter to the data
-  for_each(dataBatch.begin(), dataBatch.end(), [&](vector<float> &x) {
-    x = butterworth_filter_5th_order(x, 0.75, 5);
-  });
-  spdlog::info("Applied butterworth filter " + to_string(dataBatch[0].size()));
+void DataTransformers::center_and_scale(vector<vector<float>> &data) {
+  for (auto &row : data) {
+    float mean = accumulate(row.begin(), row.end(), 0.0) / row.size();
+    for (auto &val : row) {
+        val -= mean;
+    }
+    float std_dev = 0;
+    for (auto &val : row) {
+        std_dev += val * val;
+    }
+    std_dev = sqrt(std_dev / row.size());
+    for (auto &val : row) {
+        val /= std_dev;
+    }
+  }
+}
+
+std::vector<float>& DataTransformers::apply_kalman_filter(std::vector<float> &signal, float process_noise, float measurement_noise)
+{
+    if (signal.empty())
+        throw std::invalid_argument("The input signal is empty");
+    std::vector<float> filtered(signal.size());
+    // Initialize Kalman filter variables
+    float x_est_last = signal[0]; // The last estimated value
+    float P_last = 1; // The last error estimate
+    for (int i = 0; i < signal.size(); i++) {
+        // Time update
+        float x_temp_est = x_est_last;
+        float P_temp = P_last + process_noise;
+        // Measurement update
+        float K = P_temp / (P_temp + measurement_noise);
+        float x_est = x_temp_est + K * (signal[i] - x_temp_est);
+        float P = (1 - K) * P_temp;
+        filtered[i] = x_est;
+        // Update for next iteration
+        x_est_last = x_est;
+        P_last = P;
+    }
+    signal = filtered;
+    return signal;
+}
+void DataTransformers::apply_band_pass_filter(std::vector<std::vector<float>>& dataBatch) {
+
+    for (auto& signal : dataBatch) {
+        signal = butterworth_filter_5th_order(signal, 0.75, 5.0);
+    }
+
+}
+
+void DataTransformers::apply_kalman_filter(std::vector<std::vector<float>>& dataBatch) {
+
+    for (auto& signal : dataBatch) {
+        signal = apply_kalman_filter(signal, 0.1, 0.1);
+    }
+
+}
+
+
+std::vector<float> DataTransformers::band_pass_filter(std::vector<float> signal, float low_cut, float high_cut)
+{
+    // Coefficients for band pass filter
+    float a0 = 1;
+    float a1 = -4.49755859375;
+    float a2 = 8.994140625;
+    float a3 = -9.98779296875;
+    float a4 = 5.498046875;
+    float a5 = -1.24755859375;
+    float b0 = 0.0033111572265625;
+    float b1 = 0.016655712890625;
+    float b2 = 0.032958984375;
+    float b3 = 0.032958984375;
+    float b4 = 0.016655712890625;
+    float b5 = 0.0033111572265625;
+
+    // Initialize filtered signal vector
+    std::vector<float> filtered_signal(signal.size());
+
+    // Apply band pass filter to signal
+    for (int i = 5; i < signal.size(); i++) {
+        filtered_signal[i] = b0*signal[i] + b1*signal[i-1] + b2*signal[i-2] + b3*signal[i-3] + b4*signal[i-4] + b5*signal[i-5] - a1*filtered_signal[i-1] - a2*filtered_signal[i-2] - a3*filtered_signal[i-3] - a4*filtered_signal[i-4] - a5*filtered_signal[i-5];
+    }
+
+    return filtered_signal;
 }
 
 std::vector<float>
@@ -235,3 +286,62 @@ int DataTransformers::countPeaks(const std::vector<float> stream) {
     }
     return peaks;
 }
+
+// std::vector<std::complex<float>> dft(std::vector<float> signal) {
+//     // Allocate memory for the input and output arrays
+//     fftwf_complex *in, *out;
+//     in = (fftwf_complex*) fftwf_malloc(sizeof(fftwf_complex) * signal.size());
+//     out = (fftwf_complex*) fftwf_malloc(sizeof(fftwf_complex) * signal.size());
+//     // Copy the input signal to the input array
+//     for (int i = 0; i < signal.size(); i++) {
+//         in[i][0] = signal[i];
+//         in[i][1] = 0;
+//     }
+//     // Create a plan for the forward DFT
+//     fftwf_plan plan = fftwf_plan_dft_1d(signal.size(), in, out, FFTW_FORWARD, FFTW_ESTIMATE);
+//     // Execute the plan
+//     fftwf_execute(plan);
+//     // Copy the output to a vector of complex numbers
+//     std::vector<std::complex<float>> dft_result(signal.size());
+//     for (int i = 0; i < signal.size(); i++) {
+//         dft_result[i] = std::complex<float>(out[i][0], out[i][1]);
+//     }
+//     // Clean up
+//     fftwf_destroy_plan(plan);
+//     fftwf_free(in);
+//     fftwf_free(out);
+//     return dft_result;
+// }
+
+// void write_frequency_content(std::vector<std::complex<float>> dft_result, std::string filename) {
+//     std::vector<float> magnitude(dft_result.size());
+//     for (int i = 0; i < dft_result.size(); i++) {
+//         magnitude[i] = std::abs(dft_result[i]);
+//     }
+//     std::ofstream outfile(filename);
+//     for (int i = 0; i < magnitude.size(); i++) {
+//         outfile << i << " " << magnitude[i] << std::endl;
+//     }
+//     outfile.close();
+// }
+
+
+
+// std::vector<float> band_pass_filter(std::vector<float> signal, float low_cut, float high_cut, float fs) {
+//     // Perform DFT
+//     std::vector<std::complex<float>> dft_result = dft(signal, fs);
+//     // Apply the band-pass filter
+//     for (int i = 0; i < dft_result.size(); i++) {
+//         if (i < low_cut || i > high_cut) {
+//             dft_result[i] = std::complex<float>(0, 0);
+//         }
+//     }
+//     // Perform Inverse DFT
+//     std::vector<std::complex<float>> filtered_dft = idft(dft_result, fs);
+//     // Convert the result to real numbers
+//     std::vector<float> filtered_signal(filtered_dft.size());
+//     for (int i = 0; i < filtered_dft.size(); i++) {
+//         filtered_signal[i] = filtered_dft[i].real();
+//     }
+//     return filtered_signal;
+// }
