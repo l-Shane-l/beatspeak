@@ -25,7 +25,7 @@ using namespace cv;
 using namespace Eigen;
 
 struct DataTransformers {
-  DataTransformers() { time_interval = 60; }
+  DataTransformers() { time_interval = 10; }
   DataTransformers(int time_interval, vector<vector<float>> data)
       : time_interval(time_interval), dataBatch(data) {}
   vector<float> PCA(vector<vector<float>> data);
