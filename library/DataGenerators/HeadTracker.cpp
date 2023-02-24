@@ -4,6 +4,11 @@
 #include <thread>
 
 void HeadTracker::trackHeadInFrame(Mat &FrameRGB, Mat &FrameGray) {
+  Mat blurredGray;
+  GaussianBlur(FrameGray, blurredGray, Size(5, 5), 0); // add Gaussian blur with kernel size of 5x5
+
+  trackerData->frameGray = blurredGray; // use the blurred image for processing
+  trackerData->frameRGB = FrameRGB;
 
   trackerData->frameGray = FrameGray;
   trackerData->frameRGB = FrameRGB;
