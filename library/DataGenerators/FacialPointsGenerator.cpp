@@ -42,8 +42,7 @@ void FacialPointsGenerator::updateTrackedPoints() {
 
     try {
 
-     cv::calcOpticalFlowPyrLK(Data->oldFrame, Data->frameGray, prevPoints, currentPoints, trackingStatus, errors, winSize, 10, criteria, 0, 0.001);
-
+      calcOpticalFlowPyrLK(Data->oldFrame, Data->frameGray, prevPoints, currentPoints, trackingStatus, errors, winSize, maxLevel, criteria, flags, minEigThreshold);
     } catch (const exception &e) {
       cout << e.what() << endl;
     }
