@@ -35,10 +35,15 @@ void FacialPointsGenerator::updateTrackedPoints() {
       Data->frameGray.cols == Data->oldFrame.cols) {
     TermCriteria criteria =
         TermCriteria((TermCriteria::COUNT) + (TermCriteria::EPS), 10, 0.03);
+          Size winSize(31, 31);
+    int maxLevel = 10;
+    int flags = 0;
+    double minEigThreshold = 1e-4;
+
     try {
-      calcOpticalFlowPyrLK(Data->oldFrame, Data->frameGray, prevPoints,
-                           currentPoints, trackingStatus, errors, Size(15, 15),
-                           3, criteria);
+
+     cv::calcOpticalFlowPyrLK(Data->oldFrame, Data->frameGray, prevPoints, currentPoints, trackingStatus, errors, winSize, 10, criteria, 0, 0.001);
+
     } catch (const exception &e) {
       cout << e.what() << endl;
     }
