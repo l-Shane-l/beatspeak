@@ -16,7 +16,20 @@ void FacialPointsGenerator::generateMask() {
 
 void FacialPointsGenerator::generateTrackingPoints() {
   goodFeaturesToTrack(Data->frameGray, generatedPoints, numOfPoints, 0.001, 10,
-                      maskedFrame, 3, false, 0.04);
+                      maskedFrame, 3, true, 0.04);
+
+  // initialize ORB feature detector
+
+// detect keypoints and compute descriptors
+// std::vector<cv::KeyPoint> keypoints;
+
+// orb->detectAndCompute(Data->frameGray, maskedFrame, keypoints, descriptors);
+
+// convert keypoints to Point2f format
+
+// for (int i = 0; i < keypoints.size(); i++) {
+//   generatedPoints.push_back(keypoints[i].pt);
+// }
   prevPoints = generatedPoints;
 }
 

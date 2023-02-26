@@ -66,6 +66,7 @@ void DataProcessor::process_data() {
   int heartrate = data_transformers.countPeaks(component) * mutiple;
 
   spdlog::info("Heartrates is " + to_string(heartrate) + " bpm");
+  heart_rate_ptr_->store(heartrate);
   result_file.open("result.dat");
   float placeholder = 0;
   result_file << placeholder << endl;

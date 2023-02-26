@@ -16,6 +16,9 @@
 #include <string>
 #include <thread>
 #include <vector>
+#include <atomic>
+
+
 
 const int downsample{1};
 const double TIME_BASE{0.001};
@@ -24,7 +27,7 @@ using namespace std;
 
 int run(int argc, char *argv[]);
 void getInput(shared_ptr<WebCam> &cam);
-void trackHead(shared_ptr<WebCam> &cam, unique_ptr<HeadTracker> &tracker);
+void trackHead(shared_ptr<WebCam> &cam, unique_ptr<HeadTracker> &tracker, atomic<int> &estimatedHeartRate);
 void sendOutput(shared_ptr<WebCam> &cam);
 void processData(unique_ptr<DataProcessor> &processor);
 void setUp();

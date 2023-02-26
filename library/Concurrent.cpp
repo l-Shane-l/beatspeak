@@ -4,6 +4,8 @@
 using namespace cv;
 
 promise<bool> prms;
+  int countdown_duration = 10; // 10 seconds
+  auto start_time = std::chrono::steady_clock::now();
 future<bool> ftr = prms.get_future();
 std::mutex mutexA, mutexB, mutexC;
 std::condition_variable condA, condB, condC;
@@ -18,17 +20,17 @@ int run(int argc, char *argv[]) {
               << "for demo of software without camera" << std::endl;
     return 1;
   }
-
+  std::atomic<int> estimatedHeartRate(-1);
   shared_ptr<WebCam> camInputRef(new WebCam(argv[1]));
   shared_ptr<WebCam> camOutputRef = camInputRef;
   shared_ptr<lock_free_queue<vector<Point2f>>> data_points_queue(
       new lock_free_queue<vector<Point2f>>());
 
   unique_ptr<HeadTracker> tracker(new HeadTracker(data_points_queue));
-  unique_ptr<DataProcessor> processor(new DataProcessor(data_points_queue));
+  unique_ptr<DataProcessor> processor(new DataProcessor(data_points_queue, &estimatedHeartRate));
 
   thread t1(getInput, ref(camInputRef));
-  thread t2(trackHead, ref(camInputRef), ref(tracker));
+  thread t2(trackHead, ref(camInputRef), ref(tracker), ref(estimatedHeartRate));
   thread t3(sendOutput, ref(camInputRef));
   thread t4(processData, ref(processor));
 
@@ -53,7 +55,7 @@ void getInput(shared_ptr<WebCam> &cam) {
   }
 }
 
-void trackHead(shared_ptr<WebCam> &cam, unique_ptr<HeadTracker> &tracker) {
+void trackHead(shared_ptr<WebCam> &cam, unique_ptr<HeadTracker> &tracker, std::atomic<int> &estimatedHeartRate) {
   spdlog::info("Track Head");
   bool run = cam->running;
   std::unique_lock<std::mutex> lck(mutexB);
@@ -62,9 +64,22 @@ void trackHead(shared_ptr<WebCam> &cam, unique_ptr<HeadTracker> &tracker) {
     condB.wait(lck);
     run = cam->running;
     tracker->trackHeadInFrame(cam->getframeRGB(), cam->getframeGray());
-    string hr = "HeartRate Unknown";
-    putText(cam->getframeRGB(), hr, Point(30, 30), FONT_HERSHEY_COMPLEX, 0.8,
-            Scalar(0, 0, 255), 1);
+    estimatedHeartRate.load();
+    auto elapsed_time = std::chrono::steady_clock::now() - start_time;
+    int remaining_time = countdown_duration - std::chrono::duration_cast<std::chrono::seconds>(elapsed_time).count();
+    if (remaining_time <= 0) {
+      remaining_time = 10 - std::abs(remaining_time) % 10;
+    }
+    string nextReading = "Next Reading in: " + to_string(remaining_time) + " seconds";
+    string hr = "Calculating your Heart Rate ...";
+    if(estimatedHeartRate != -1){
+      hr = "Your Estimated Heart Rate is: " + to_string(estimatedHeartRate);
+    
+    }
+    cv::Rect rect(1, 1, 800, 75);
+    cv::rectangle(cam->getframeRGB(), rect, cv::Scalar(0, 0, 0), cv::FILLED);
+    cv::putText(cam->getframeRGB(), hr, cv::Point(30, 30), cv::FONT_HERSHEY_COMPLEX, 0.8, cv::Scalar(255, 255, 255), 1);
+    cv::putText(cam->getframeRGB(), nextReading, cv::Point(30, 60), cv::FONT_HERSHEY_COMPLEX, 0.8, cv::Scalar(255, 255, 255), 1);
   }
 }
 

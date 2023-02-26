@@ -6,6 +6,7 @@
 #include "opencv2/imgproc.hpp"
 #include "opencv2/objdetect.hpp"
 #include "opencv2/video/tracking.hpp"
+#include "opencv2/features2d.hpp"
 #include <iostream>
 #include <memory>
 
@@ -32,6 +33,13 @@ private:
   uchar notFound{'0'};
   int numOfPoints;
   shared_ptr<TrackerData> Data;
+  float scaleFactor = 1.2f;
+int numLevels = 8;
+int edgeThreshold = 0.001;
+int firstLevel = 0;
+int scoreType = cv::ORB::HARRIS_SCORE;
+  Ptr<cv::ORB> orb = cv::ORB::create(numOfPoints, scaleFactor, numLevels, edgeThreshold, firstLevel, 2, scoreType, 31, 20);
+  Mat descriptors;
 };
 
 #endif

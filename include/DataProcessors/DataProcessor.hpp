@@ -17,7 +17,7 @@ using namespace std;
 using namespace cv;
 struct DataProcessor {
 public:
-  DataProcessor(shared_ptr<lock_free_queue<vector<Point2f>>> queue) {
+  DataProcessor(shared_ptr<lock_free_queue<vector<Point2f>>> queue, std::atomic<int>* heart_rate_ptr) : heart_rate_ptr_(heart_rate_ptr){
     input_data = move(queue);
     output_file.open("output.dat");
     post_filter.open("post_filter.txt");
@@ -30,7 +30,7 @@ public:
 private:
   int time_interval = 10;
   vector<vector<float>> data;
-
+  std::atomic<int>* heart_rate_ptr_;
   shared_ptr<lock_free_queue<vector<Point2f>>> input_data;
   ofstream output_file;
   ofstream result_file;
