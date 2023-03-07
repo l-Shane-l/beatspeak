@@ -18,7 +18,7 @@ struct WebCam {
         std::cout << "Video not Found" << std::endl;
         exit(0);
       }
-    } else if (settings == "cam") {
+    } else if (settings == "cam" || settings == "movesense") {
       cap.open(0);
       cap.set(CAP_PROP_BUFFERSIZE, 2);
       std::cout << "Camera Found" << std::endl;
