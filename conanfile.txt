@@ -1,8 +1,11 @@
 [requires]
 eigen/3.4.0
-spdlog/[>=1.4.1]
-
+spdlog/1.11.0
+opencv/4.5.5
+libcurl/7.77.0
+fftw/3.3.9
 
 
 [generators]
-cmake
+CMakeDeps
+CMakeToolchain

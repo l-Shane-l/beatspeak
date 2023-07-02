@@ -1,6 +1,6 @@
 #ifndef WebCam_hpp
 #define WebCam_hpp
-#include "opencv2/opencv.hpp"
+#include <opencv2/opencv.hpp>
 #include <algorithm>
 #include <iostream>
 #include <mutex>

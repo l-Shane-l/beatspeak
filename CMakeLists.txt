@@ -5,7 +5,7 @@ project(Beatspeak VERSION 1.0.1)
 
 include_directories(include)
 add_subdirectory(library)
-add_subdirectory (source)
+add_executable(${PROJECT_NAME} library/App/main.hpp)
 
 
 
