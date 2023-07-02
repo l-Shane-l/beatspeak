@@ -1,8 +1,7 @@
 #include "../../include/DataProcessors/DataProcessor.hpp"
 
 #include "spdlog/fmt/ostr.h"
-#include "spdlog/spdlog.h"
-
+#include "spdlog/spdlog.h"    
 void DataProcessor::log_data() {
   current = chrono::system_clock::now();
   if (chrono::duration_cast<chrono::seconds>(current - start).count() >=

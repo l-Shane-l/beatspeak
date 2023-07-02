@@ -13,23 +13,23 @@ void FacialPointsGenerator::generateMask() {
     fillConvexPoly(maskedFrame, eyeRegion, (0));
   }
 }
-
 void FacialPointsGenerator::generateTrackingPoints() {
   goodFeaturesToTrack(Data->frameGray, generatedPoints, numOfPoints, 0.001, 10,
                       maskedFrame, 3, true, 0.04);
 
   // initialize ORB feature detector
 
-// detect keypoints and compute descriptors
-// std::vector<cv::KeyPoint> keypoints;
+  // detect keypoints and compute descriptors
+  // std::vector<cv::KeyPoint> keypoints;
 
-// orb->detectAndCompute(Data->frameGray, maskedFrame, keypoints, descriptors);
+  // orb->detectAndCompute(Data->frameGray, maskedFrame, keypoints,
+  // descriptors);
 
-// convert keypoints to Point2f format
+  // convert keypoints to Point2f format
 
-// for (int i = 0; i < keypoints.size(); i++) {
-//   generatedPoints.push_back(keypoints[i].pt);
-// }
+  // for (int i = 0; i < keypoints.size(); i++) {
+  //   generatedPoints.push_back(keypoints[i].pt);
+  // }
   prevPoints = generatedPoints;
 }
 
@@ -48,14 +48,16 @@ void FacialPointsGenerator::updateTrackedPoints() {
       Data->frameGray.cols == Data->oldFrame.cols) {
     TermCriteria criteria =
         TermCriteria((TermCriteria::COUNT) + (TermCriteria::EPS), 10, 0.03);
-          Size winSize(31, 31);
+    Size winSize(31, 31);
     int maxLevel = 10;
     int flags = 0;
     double minEigThreshold = 1e-4;
 
     try {
 
-      calcOpticalFlowPyrLK(Data->oldFrame, Data->frameGray, prevPoints, currentPoints, trackingStatus, errors, winSize, maxLevel, criteria, flags, minEigThreshold);
+      calcOpticalFlowPyrLK(Data->oldFrame, Data->frameGray, prevPoints,
+                           currentPoints, trackingStatus, errors, winSize,
+                           maxLevel, criteria, flags, minEigThreshold);
     } catch (const exception &e) {
       cout << e.what() << endl;
     }

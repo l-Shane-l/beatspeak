@@ -35,10 +35,12 @@ private:
   shared_ptr<TrackerData> Data;
   float scaleFactor = 1.2f;
 int numLevels = 8;
-int edgeThreshold = 0.001;
+double edgeThreshold = 0.001;
 int firstLevel = 0;
 int scoreType = cv::ORB::HARRIS_SCORE;
-  Ptr<cv::ORB> orb = cv::ORB::create(numOfPoints, scaleFactor, numLevels, edgeThreshold, firstLevel, 2, scoreType, 31, 20);
+  //TODO
+  // Below is 25 which is the number of points, it was not created properly this is a quickfix
+  Ptr<cv::ORB> orb = cv::ORB::create(25, scaleFactor, numLevels, edgeThreshold, firstLevel, 2, scoreType, 31, 20);
   Mat descriptors;
 };
 

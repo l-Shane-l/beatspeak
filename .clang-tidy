@@ -1,0 +1,11 @@
+Checks: '-*,bugprone-*,cppcoreguidelines-*,performance-*,readability-*'
+
+WarningsAsErrors: ''
+
+HeaderFilterRegex: ''
+
+AnalyzeTemporaryDtors: false
+
+FormatStyle:     file
+User:            user
+
