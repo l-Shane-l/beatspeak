@@ -1,8 +1,0 @@
-[requires]
-eigen/3.4.0
-spdlog/[>=1.4.1]
-
-
-
-[generators]
-cmake
